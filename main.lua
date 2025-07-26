@@ -3,6 +3,8 @@
 
 -- Load our other files. The order is important.
 -- Class must come first so the other files can use it.
+-- 'game' must come before 'globals' so that the Game class exists
+-- before we try to add functions to it in globals.lua.
 require 'class'
 require 'game'
 require 'globals'
@@ -10,8 +12,10 @@ require 'globals'
 -- The love.load() function is called only once at the start of the game.
 function love.load()
     -- Create a new instance of our Game object.
-    -- This will call Game:init() and Game:set_globals()
     GameInstance = Game:new()
+
+    -- Initialize the game object to set up globals
+    GameInstance:init()
 
     -- Now that the game object is created, run its startup sequence.
     GameInstance:start_up()
