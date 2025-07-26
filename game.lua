@@ -41,13 +41,19 @@ function Game:draw()
 
     -- The main draw loop. It draws all parentless nodes.
     -- Children are drawn automatically by their parents.
-    for k, v in pairs(G.I.NODE) do
-        if not v.parent then
-            love.graphics.push()
-            v:translate_container()
-            v:draw()
-            love.graphics.pop()
-        end
+    -- for k, v in pairs(G.I.NODE) do
+    --     if not v.parent then
+    --         love.graphics.push()
+    --         v:translate_container()
+    --         v:draw()
+    --         love.graphics.pop()
+    --     end
+    -- end
+    -- For the splash screen and main menu, we draw the specific background and logo objects directly.
+    -- This is more reliable than looping through a generic list for this specific state.
+    if G.STATE == G.STATES.SPLASH or G.STATE == G.STATES.MENU then
+        if G.SPLASH_BACK then G.SPLASH_BACK:draw() end
+        if G.SPLASH_LOGO then G.SPLASH_LOGO:draw() end
     end
 
     -- Draw the menu text if the flag is set

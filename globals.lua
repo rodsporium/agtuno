@@ -19,6 +19,16 @@ function Game:set_globals()
     }
 
     --||||||||||||||||||||||||||||||
+    --           SETTINGS
+    --||||||||||||||||||||||||||||||
+    self.SETTINGS = { -- Simplified settings
+        paused = false,
+        GAMESPEED = 1,
+        reduced_motion = false,
+        GRAPHICS = { texture_scaling = 1 }
+    }
+
+    --||||||||||||||||||||||||||||||
     --          INSTANCES
     --||||||||||||||||||||||||||||||
     self.ARGS = {}
@@ -33,24 +43,16 @@ function Game:set_globals()
         CARDAREA = {},
         ALERT = {}
     }
-
-    -- Other essential global tables
+    self.ANIMATION_ATLAS = {}
+    self.ASSET_ATLAS = {}
     self.MOVEABLES = {}
     self.ANIMATIONS = {}
     self.DRAW_HASH = {}
-    self.STAGE_OBJECTS = { {}, {}, {} } -- One table for each stage
-    self.SETTINGS = { -- Simplified settings
-        paused = false,
-        GAMESPEED = 1,
-        reduced_motion = false,
-        GRAPHICS = { texture_scaling = 1 }
-    }
-    
+
     --||||||||||||||||||||||||||||||
     --        GAMESTATES
     --||||||||||||||||||||||||||||||
     -- Game States
-    self.STAGES = { MAIN_MENU = 1, RUN = 2, SANDBOX = 3 }
     self.STATES = {
         SELECTING_HAND = 1,
         HAND_PLAYED = 2,
@@ -66,8 +68,17 @@ function Game:set_globals()
         TUTORIAL = 12,
         SPLASH = 13
     }
-    self.STAGE = 1
-    self.STATE = 13
+    
+    self.STAGES = {
+        MAIN_MENU = 1,
+        RUN = 2,
+        SANDBOX = 3
+    }
+    self.STAGE_OBJECTS = {
+        {}, {}, {}
+    } -- One table for each stage
+    self.STAGE = self.STAGES.MAIN_MENU
+    self.STATE = self.STATES.SPLASH
 
     --||||||||||||||||||||||||||||||
     --        RENDER SCALE
