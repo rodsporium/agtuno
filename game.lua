@@ -6,12 +6,9 @@ Game = Object:extend()
 
 -- The constructor for our Game class
 function Game:init()
-    -- Set the global G to point to this instance of the Game object
-    G = self
-
-    -- Call the function from globals.lua to populate the G table
+    -- This function now just calls set_globals and creates the Event Manager.
+    -- The global G is created and assigned in main.lua
     self:set_globals()
-
     self.E_MANAGER = EventManager()
 end
 
@@ -19,7 +16,6 @@ end
 function Game:start_up()
     -- This function loads assets and prepares the game window
     self:set_render_settings()
-
     -- This function starts the game's title sequence
     self:splash_screen()
 end
@@ -39,18 +35,7 @@ end
 function Game:draw()
     love.graphics.clear(G.C.BLACK)
 
-    -- The main draw loop. It draws all parentless nodes.
-    -- Children are drawn automatically by their parents.
-    -- for k, v in pairs(G.I.NODE) do
-    --     if not v.parent then
-    --         love.graphics.push()
-    --         v:translate_container()
-    --         v:draw()
-    --         love.graphics.pop()
-    --     end
-    -- end
     -- For the splash screen and main menu, we draw the specific background and logo objects directly.
-    -- This is more reliable than looping through a generic list for this specific state.
     if G.STATE == G.STATES.SPLASH or G.STATE == G.STATES.MENU then
         if G.SPLASH_BACK then G.SPLASH_BACK:draw() end
         if G.SPLASH_LOGO then G.SPLASH_LOGO:draw() end
@@ -144,12 +129,16 @@ function Game:main_menu(change_context)
     }))
 end
 
+-------------------------------------------------
+-- HELPER FUNCTIONS
+-------------------------------------------------
+
 -- This function will eventually create the button UI. For now, it just sets a flag.
-function Game:set_main_menu_UI()
-    self.show_menu_text = true
+function set_main_menu_UI()
+    G.show_menu_text = true
 end
 
--- A placeholder function needed by the engine files for animations
+-- This function creates an 'ease' event to smoothly animate a value over time.
 function ease_value(ref_table, ref_value, ease_to, _, _, _, duration)
     G.E_MANAGER:add_event(Event({
         trigger = 'ease',

@@ -1,17 +1,20 @@
 -- main.lua
 -- This is the main entry point for the LÖVE2D game.
 
--- Load engine components first, in order of dependency
+-- Load the foundational files first
 require 'engine/object'
+require 'game'
+require 'globals'
+
+-- Create the one and only global Game object
+G = Game()
+
+-- Now that G exists, load the engine files that depend on it
 require 'engine/event'
 require 'engine/node'
 require 'engine/moveable'
 require 'engine/sprite'
 require "functions/misc_functions"
-
--- Load game logic and data
-require 'game'
-require 'globals'
 
 -- The love.load() function is called only once at the start of the game.
 function love.load()
