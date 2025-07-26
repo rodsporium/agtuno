@@ -5,12 +5,12 @@
 Game = Object:extend()
 
 -- -- The constructor for our Game class
--- function Game:init()
---     -- Set the global G to point to this instance of the Game object
---     G = self
---     -- Call the function from globals.lua to populate the G table
---     self:set_globals()
--- end
+function Game:init()
+    -- Set the global G to point to this instance of the Game object
+    G = self
+    -- Call the function from globals.lua to populate the G table
+    self:set_globals()
+end
 
 -- This function is called once at the very beginning of the game
 function Game:start_up()
@@ -24,12 +24,12 @@ end
 
 -- The main update loop, called every frame by main.lua
 function Game:update(dt)
-    -- Store delta time for use anywhere
+    -- -- Store delta time for use anywhere
     -- self.TIMERS.dt = dt
-    x = x + 5 * TIMERS.dt
-    -- ### STATE MACHINE ROUTER ###
-    -- This is the core of the game's flow. We check the current state
-    -- and call the appropriate update function.
+
+    -- -- ### STATE MACHINE ROUTER ###
+    -- -- This is the core of the game's flow. We check the current state
+    -- -- and call the appropriate update function.
     -- if self.STATE == G.STATES.MENU then
     --     self:update_menu(dt)
     -- elseif self.STATE == G.STATES.PLAYING then
@@ -41,9 +41,9 @@ end
 
 -- The main draw loop, called every frame by main.lua
 function Game:draw()
-    love.graphics.rectangle("line", x, 50, 200, 150)
-    -- ### STATE MACHINE RENDERER ###
-    -- We check the current state and call the appropriate draw function.
+
+    -- -- ### STATE MACHINE RENDERER ###
+    -- -- We check the current state and call the appropriate draw function.
     -- if self.STATE == G.STATES.MENU then
     --     self:draw_menu()
     -- elseif self.STATE == G.STATES.PLAYING then

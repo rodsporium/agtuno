@@ -6,6 +6,7 @@
 -- 'game' must come before 'globals' so that the Game class exists
 -- before we try to add functions to it in globals.lua.
 -- require 'class'
+require "engine/object"
 require 'game'
 require 'globals'
 
@@ -35,16 +36,16 @@ end
 -- The love.draw() function is called every frame after love.update().
 function love.draw()
     -- Set a background color
-    love.graphics.setBackgroundColor(G.C.GREY)
+    -- love.graphics.setBackgroundColor(G.C.GREY)
 
     -- Set the drawing color to white
-    love.graphics.setColor(G.C.WHITE)
+    -- love.graphics.setColor(G.C.WHITE)
 
     -- We simply delegate the draw call to our Game object.
     G:draw()
 end
 
--- This is a helper function for handling key presses
+-- -- This is a helper function for handling key presses
 -- function love.keypressed(key)
 --     -- This makes the 'wasPressed' function work
 --     love.keyboard.wasPressed = function(key)
