@@ -30,7 +30,7 @@ function Game:set_globals()
         },
 
         -- We will set the current stage and state in the Game object itself
-        STAGE = nil,
-        STATE = nil,
+        STAGE = 0,
+        STATE = 0,
     }
 end

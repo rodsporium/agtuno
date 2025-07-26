@@ -4,8 +4,8 @@
 -- Load our other files. The order is important.
 -- Class must come first so the other files can use it.
 require 'class'
-require 'globals'
 require 'game'
+require 'globals'
 
 -- The love.load() function is called only once at the start of the game.
 function love.load()
