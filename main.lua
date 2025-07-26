@@ -1,29 +1,24 @@
 -- main.lua
 -- This is the main entry point for the LÖVE2D game.
 
--- Load our other files. The order is important.
--- Class must come first so the other files can use it.
--- 'game' must come before 'globals' so that the Game class exists
--- before we try to add functions to it in globals.lua.
--- require 'class'
-require "engine/object"
+-- Load engine components first, in order of dependency
+require 'engine/object'
+require 'engine/event'
+require 'engine/node'
+require 'engine/moveable'
+require 'engine/sprite'
+require "functions/misc_functions"
+
+-- Load game logic and data
 require 'game'
 require 'globals'
 
 -- The love.load() function is called only once at the start of the game.
 function love.load()
+    -- Initialize the game object to set up globals and the event manager
+    G:init()
+    -- Now that the game object is created, run its startup sequence.
     G:start_up()
-    -- -- Create a new instance of our Game object.
-    -- GameInstance = Game:new()
-
-    -- -- Initialize the game object to set up globals
-    -- GameInstance:init()
-
-    -- -- Now that the game object is created, run its startup sequence.
-    -- GameInstance:start_up()
-
-    -- -- Set a default font for drawing text
-    -- love.graphics.setFont(love.graphics.newFont(24))
 end
 
 -- The love.update() function is called every frame.
@@ -35,12 +30,6 @@ end
 
 -- The love.draw() function is called every frame after love.update().
 function love.draw()
-    -- Set a background color
-    -- love.graphics.setBackgroundColor(G.C.GREY)
-
-    -- Set the drawing color to white
-    -- love.graphics.setColor(G.C.WHITE)
-
     -- We simply delegate the draw call to our Game object.
     G:draw()
 end

@@ -21,6 +21,7 @@ function Game:set_globals()
     --||||||||||||||||||||||||||||||
     --          INSTANCES
     --||||||||||||||||||||||||||||||
+    self.ARGS = {}
     -- Instance tables for all object types
     self.I = {
         NODE = {},
