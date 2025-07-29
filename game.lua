@@ -6,16 +6,16 @@ Game = Object:extend()
 
 -- The constructor for our Game class
 function Game:init()
-    -- This function now just calls set_globals and creates the Event Manager.
-    -- The global G is created and assigned in main.lua
+    G = self
+    
     self:set_globals()
-    self.E_MANAGER = EventManager()
 end
 
 -- This function is called once at the very beginning of the game
 function Game:start_up()
     -- This function loads assets and prepares the game window
     self:set_render_settings()
+    self.E_MANAGER = EventManager()
     -- This function starts the game's title sequence
     self:splash_screen()
 end

@@ -119,3 +119,5 @@ function Game:set_globals()
         }
 
 end
+
+G = Game()

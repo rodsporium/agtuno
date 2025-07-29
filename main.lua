@@ -3,24 +3,16 @@
 
 -- Load the foundational files first
 require 'engine/object'
-require 'game'
-require 'globals'
-
--- Create the one and only global Game object
-G = Game()
-
--- Now that G exists, load the engine files that depend on it
-require 'engine/event'
-require 'engine/node'
-require 'engine/moveable'
-require 'engine/sprite'
+require "engine/event"
+require "engine/node"
+require "engine/moveable"
+require "engine/sprite"
 require "functions/misc_functions"
+require "game"
+require "globals"
 
 -- The love.load() function is called only once at the start of the game.
 function love.load()
-    -- Initialize the game object to set up globals and the event manager
-    G:init()
-    -- Now that the game object is created, run its startup sequence.
     G:start_up()
 end
 
