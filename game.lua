@@ -7,7 +7,7 @@ Game = Object:extend()
 -- The constructor for our Game class
 function Game:init()
     G = self
-    
+
     self:set_globals()
 end
 
@@ -36,9 +36,9 @@ function Game:draw()
     love.graphics.clear(G.C.BLACK)
 
     -- For the splash screen and main menu, we draw the specific background and logo objects directly.
-    if G.STATE == G.STATES.SPLASH or G.STATE == G.STATES.MENU then
-        if G.SPLASH_BACK then G.SPLASH_BACK:draw() end
-        if G.SPLASH_LOGO then G.SPLASH_LOGO:draw() end
+    if self.STATE == self.STATES.SPLASH or self.STATE == self.STATES.MENU then
+        if self.SPLASH_BACK then self.SPLASH_BACK:draw() end
+        if self.SPLASH_LOGO then self.SPLASH_LOGO:draw() end
     end
 
     -- Draw the menu text if the flag is set
@@ -50,10 +50,10 @@ end
 
 -- A simplified version of Balatro's asset loading function
 function Game:set_render_settings()
-    G.ASSET_ATLAS = {}
+    self.ASSET_ATLAS = {}
     -- NOTE: This requires the file 'resources/textures/1x/balatro.png' to exist
     if love.filesystem.getInfo("resources/textures/1x/balatro.png") then
-        G.ASSET_ATLAS["balatro"] = {
+        self.ASSET_ATLAS["balatro"] = {
             image = love.graphics.newImage("resources/textures/1x/balatro.png"),
             px = 333, py = 216
         }
@@ -64,24 +64,24 @@ function Game:set_render_settings()
         love.graphics.setCanvas(canvas)
         love.graphics.clear(G.C.RED)
         love.graphics.setCanvas()
-        G.ASSET_ATLAS["balatro"] = { image = canvas, px = 333, py = 216 }
+        self.ASSET_ATLAS["balatro"] = { image = canvas, px = 333, py = 216 }
     end
 end
 
 -- Prepares the stage for a new scene
 function Game:prep_stage(new_stage, new_state)
-    G.STAGE = new_stage or G.STAGES.MAIN_MENU
-    G.STATE = new_state or G.STATES.MENU
+    self.STAGE = new_stage or G.STAGES.MAIN_MENU
+    self.STATE = new_state or G.STATES.MENU
     
     -- G.ROOM is the main container for all game objects
-    G.ROOM = Node{T={x = 0, y = 0, w = G.TILE_W, h = G.TILE_H}}
+    self.ROOM = Node{T={x = 0, y = 0, w = G.TILE_W, h = G.TILE_H}}
 end
 
 -- This is the function that starts the title screen animation
 function Game:splash_screen()
     self:prep_stage(G.STAGES.MAIN_MENU, G.STATES.SPLASH)
     
-    G.E_MANAGER:add_event(Event({
+    self.E_MANAGER:add_event(Event({
         trigger = 'immediate',
         func = function()
             G.TIMERS.TOTAL = 0
@@ -102,14 +102,14 @@ function Game:main_menu(change_context)
     self:prep_stage(G.STAGES.MAIN_MENU, G.STATES.MENU)
 
     -- Create the background and logo sprites
-    G.SPLASH_BACK = Sprite(-30, -13, G.ROOM.T.w+60, G.ROOM.T.h+22, G.ASSET_ATLAS["balatro"], {x=0,y=0})
-    G.SPLASH_LOGO = Sprite(0, 0, 13, 13 * (216/333), G.ASSET_ATLAS["balatro"], {x=0, y=0})
+    self.SPLASH_BACK = Sprite(-30, -13, G.ROOM.T.w+60, G.ROOM.T.h+22, G.ASSET_ATLAS["balatro"], {x=0,y=0})
+    self.SPLASH_LOGO = Sprite(0, 0, 13, 13 * (216/333), G.ASSET_ATLAS["balatro"], {x=0, y=0})
     
-    G.SPLASH_LOGO:set_alignment({ major = G.ROOM, type = 'cm', offset = {x=0, y=-2} })
-    G.SPLASH_LOGO.dissolve = 1 -- Start invisible
+    self.SPLASH_LOGO:set_alignment({ major = G.ROOM, type = 'cm', offset = {x=0, y=-2} })
+    self.SPLASH_LOGO.dissolve = 1 -- Start invisible
 
     -- Use the event manager to fade in the logo
-    G.E_MANAGER:add_event(Event({
+    self.E_MANAGER:add_event(Event({
         trigger = 'after',
         delay = 0.5,
         func = function()
@@ -119,7 +119,7 @@ function Game:main_menu(change_context)
     }))
 
     -- Use the event manager to show the menu text after the logo
-    G.E_MANAGER:add_event(Event({
+    self.E_MANAGER:add_event(Event({
         trigger = 'after',
         delay = 2.5,
         func = function()
