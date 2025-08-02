@@ -10,7 +10,7 @@ function update(dt)
 end
 
 function draw()
-    draw_circle()
+    draw_fightscene()
 end
 
 function movement(dt)
@@ -28,6 +28,7 @@ function movement(dt)
     end
 end
 
-function draw_circle()
-    love.graphics.circle("fill",player.x,player.y,100)
+function draw_fightscene()
+    love.graphics.draw(background, 0, 0)
+    love.graphics.draw(player.sprite,player.x,player.y,100)
 end

@@ -5,4 +5,7 @@ function set_globals()
     player = {}
     player.x = 200
     player.y = 200
+    player.sprite = love.graphics.newImage('resources/textures/1x/8bitdeck.png')
+
+    background = love.graphics.newImage('resources/textures/1x/battlefield.png')
 end
