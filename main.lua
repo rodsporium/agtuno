@@ -2,6 +2,7 @@
 -- This is the main entry point for the LÖVE2D game.
 
 -- Load the foundational files first
+require "engine/object"
 require "game"
 require "globals"
 

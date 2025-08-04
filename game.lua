@@ -30,5 +30,5 @@ end
 
 function draw_fightscene()
     love.graphics.draw(background, 0, 0)
-    love.graphics.draw(player.sprite,player.x,player.y,100)
+    love.graphics.draw(player.spriteSheet,player.x,player.y,100)
 end
