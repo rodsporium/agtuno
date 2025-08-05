@@ -3,6 +3,7 @@
 
 -- Load the foundational files first
 require "engine/object"
+require "engine/node"
 require "game"
 require "globals"
 
