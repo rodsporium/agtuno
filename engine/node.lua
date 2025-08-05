@@ -38,7 +38,6 @@ function Node:init(args)
     end
 end
 
-
 -- This is the DRAWER. It's called every frame for every object.
 function Node:draw()
     -- This is a simple check: if the object is not visible, do nothing.

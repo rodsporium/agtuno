@@ -4,6 +4,8 @@
 -- Load the foundational files first
 require "engine/object"
 require "engine/node"
+require "engine/moveable"
+require "engine/sprite"
 require "game"
 require "globals"
 
