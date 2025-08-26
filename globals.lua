@@ -21,7 +21,14 @@ function set_globals()
     }
 
     G.MOVEABLES = {}
-    G.SETTINGS = { paused = false }
+    G.SETTINGS = {
+        paused = false
+    }
+    G.TIMERS = {
+        TOTAL = 0
+    }
+
+    G.E_MANAGER = EventManager()
 
     -- Load your spritesheet image.
     G.ASSET_ATLAS = {
@@ -36,14 +43,25 @@ function set_globals()
 
     my_card = Card({
         -- T is the TARGET transform. We place it at x=50, y=200.
-        T = { x = 50, y = 200, w = 71 , h = 95 }, -- Draw the card 50% bigger
+        T = { x = 50, y = 200, w = 71 * 1.5, h = 95 * 1.5 }, -- Draw the card 50% bigger
         -- Tell the sprite to use our 'cards' atlas.
         atlas = G.ASSET_ATLAS.cards,
         -- Tell it WHICH sprite to cut out. {x=10, y=0} is the King of Hearts.
         sprite_pos = {x = 12, y = 0}
     })
 
-    -- A simple timer to trigger the animation.
-    G.animation_timer = 0.5
+    -- Schedule an animation using the EventManager!
+    G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        delay = 2, -- Wait for 2 seconds
+        func = function()
+            -- After 2 seconds, this function will run.
+            print("Event triggered! Moving card.")
+            -- It instantly changes the card's TARGET position.
+            my_card.T.x = 400
+            -- The Moveable:move() function will handle the smooth slide.
+            return true -- Return true to remove this event from the queue.
+        end
+    }))
 
 end

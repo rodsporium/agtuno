@@ -14,6 +14,9 @@ function draw()
 end
 
 function movement(dt)
+
+    G.TIMERS.TOTAL = G.TIMERS.TOTAL + dt
+
     -- if love.keyboard.isDown("right") then
     --     player.x = player.x + 100 * dt
     -- end
@@ -34,17 +37,19 @@ function movement(dt)
         v:move(dt)
     end
 
-    -- Countdown our simple timer.
-    G.animation_timer = G.animation_timer - dt
-    if G.animation_timer > 0 and G.animation_timer - dt <= 0 then
-        -- When the timer hits zero, we instantly change the card's TARGET position.
-        print("Timer finished! Moving card.")
-        my_card.T.x = 500
-        my_card.T.y = 500
+    -- -- Countdown our simple timer.
+    -- G.animation_timer = G.animation_timer - dt
+    -- if G.animation_timer > 0 and G.animation_timer - dt <= 0 then
+    --     -- When the timer hits zero, we instantly change the card's TARGET position.
+    --     print("Timer finished! Moving card.")
+    --     my_card.T.x = 500
+    --     my_card.T.y = 500
 
-        -- The Moveable:move() function will now automatically handle the smooth
-        -- animation to this new target position over the next few frames.
-    end
+    --     -- The Moveable:move() function will now automatically handle the smooth
+    --     -- animation to this new target position over the next few frames.
+    -- end
+
+    G.E_MANAGER:update(dt)
 
 end
 
