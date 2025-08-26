@@ -2,16 +2,8 @@
 -- This file defines the global 'G' table which will hold all our game-wide data.
 
 function set_globals()
-    player = {}
-    player.x = 200
-    player.y = 200
-    player.spriteSheet = love.graphics.newImage('resources/textures/1x/8bitdeck.png')
 
     background = love.graphics.newImage('resources/textures/1x/battlefield.png')
-
-    -----------
-    --- Tester
-    -----------
 
     G = {}
     Card = Sprite:extend()
@@ -41,13 +33,22 @@ function set_globals()
         }
     }
 
-    my_card = Card({
+    ace_hearts = Card({
         -- T is the TARGET transform. We place it at x=50, y=200.
         T = { x = 50, y = 200, w = 71 * 1.5, h = 95 * 1.5 }, -- Draw the card 50% bigger
         -- Tell the sprite to use our 'cards' atlas.
         atlas = G.ASSET_ATLAS.cards,
         -- Tell it WHICH sprite to cut out. {x=10, y=0} is the King of Hearts.
         sprite_pos = {x = 12, y = 0}
+    })
+
+    king_hearts = Card({
+        -- T is the TARGET transform. We place it at x=50, y=200.
+        T = { x = 50, y = 400, w = 71 * 1.5, h = 95 * 1.5 }, -- Draw the card 50% bigger
+        -- Tell the sprite to use our 'cards' atlas.
+        atlas = G.ASSET_ATLAS.cards,
+        -- Tell it WHICH sprite to cut out. {x=10, y=0} is the King of Hearts.
+        sprite_pos = {x = 11, y = 0}
     })
 
     -- Schedule an animation using the EventManager!
@@ -58,7 +59,8 @@ function set_globals()
             -- After 2 seconds, this function will run.
             print("Event triggered! Moving card.")
             -- It instantly changes the card's TARGET position.
-            my_card.T.x = 400
+            ace_hearts.T.x = 400
+            king_hearts.T.x = 400
             -- The Moveable:move() function will handle the smooth slide.
             return true -- Return true to remove this event from the queue.
         end
