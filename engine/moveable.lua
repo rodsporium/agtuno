@@ -22,6 +22,9 @@ function Moveable:init(args)
     -- This table will keep track of the object's speed.
     self.velocity = {x = 0, y = 0, r = 0, scale = 0}
 
+    -- NEW: This 'role' table will define the parent-child relationship.
+    self.role = {}
+
     -- We add every new Moveable object to a global list.
     -- This allows our love.update function to easily find and update all of them.
     G.MOVEABLES = G.MOVEABLES or {}
@@ -63,4 +66,11 @@ function Moveable:move(dt)
     self.VT.x = self.VT.x + dx * 7 * dt
     self.VT.y = self.VT.y + dy * 7 * dt
     -- Over many frames, this creates the illusion of a smooth slide, or "tween".
+
+    -- NEW: If this object has a parent (a 'major'), update its position
+    -- to follow the parent. This is what makes the card parts stick together.
+    if self.role and self.role.major and self.role.role_type == 'Glued' then
+        self.VT.x = self.role.major.VT.x
+        self.VT.y = self.role.major.VT.y
+    end
 end

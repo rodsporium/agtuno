@@ -36,16 +36,55 @@ function Card:init(X, Y, W, H, card_front, center, params)
     })
     self.children.center:set_role({major = self, role_type = 'Glued'})
 
+    -- Create the CARD BACK sprite as a child.
+    self.children.back = Sprite({
+        T = {x = X, y = Y, w = W, h = H},
+        atlas = G.ASSET_ATLAS.card_back,
+        sprite_pos = {x=0, y=0}
+    })
+    self.children.back:set_role({major = self, role_type = 'Glued'})
+
+    -- Add a 'facing' state to track which side is up.
+    self.facing = 'front'
+
     -- Add the card to the global instance list for cards.
     if getmetatable(self) == Card then
         table.insert(G.I.CARD, self)
     end
 end
 
+-- This function handles the flipping animation.
+function Card:flip()
+    -- Animate the card shrinking on the X-axis.
+    ease_value(self.VT, 'w', 0, 'linear', 0.2)
+
+    -- Schedule an event to happen after the shrink animation is complete.
+    G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        delay = 0.2,
+        func = function()
+            -- Toggle the facing direction.
+            if self.facing == 'front' then
+                self.facing = 'back'
+            else
+                self.facing = 'front'
+            end
+            -- Animate the card growing back to its original width.
+            ease_value(self.VT, 'w', self.T.w, 'linear', 0.2)
+            return true -- Remove this event from the queue.
+        end
+    }))
+end
+
 -- The Card's draw function is more complex. It needs to draw the center/back,
 -- then the front (rank/suit), and any other effects like editions.
 function Card:draw()
-    -- For this simple test, we will just draw the main sprite and its center.
-    Sprite.draw(self)
-    self.children.center:draw()
+    if self.facing == 'back' then
+        self.children.back:draw()
+    else
+        -- Draw the card itself (which is the front sprite)
+        Sprite.draw(self)
+        -- Draw the center art on top
+        self.children.center:draw()
+    end
 end

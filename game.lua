@@ -36,7 +36,7 @@ function draw_fightscene()
     love.graphics.draw(background, 0, 0)
 
     -- Loop through all the sprites in our global list and draw them.
-    for k, v in ipairs(G.I.SPRITE) do
+    for k, v in ipairs(G.I.CARD) do
         v:draw()
     end
     
@@ -111,19 +111,19 @@ function init_item_prototypes()
         j_joker = { name = 'Joker', pos = {x = 0, y = 0} }
     }
 
-    G.deck = {}
-    local suits = {'S', 'H', 'C', 'D'}
-    local ranks = {'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'}
+    G.hand_cards = {}
 
-    -- Loop through all suits and ranks to create a full 52-card deck.
-    for i, suit in ipairs(suits) do
-        for j, rank in ipairs(ranks) do
-            local card_key = suit .. '_' .. rank
-            -- Create each card stacked at the same initial position.
-            local new_card = Card(50, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS[card_key], G.P_CENTERS['c_base'])
-            table.insert(G.deck, new_card)
-        end
-    end
+    local card1 = Card(50, 200, 71 * 1.5,  95 * 1.5, G.P_CARDS['S_A'], G.P_CENTERS['c_base'])
+    table.insert(G.hand_cards, card1)
+    local card2 = Card(150, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['H_A'], G.P_CENTERS['c_base'])
+    table.insert(G.hand_cards, card2)
+    -- Create two cards and set them to face the back
+    local card3 = Card(250, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['C_A'], G.P_CENTERS['c_base'])
+    card3.facing = 'back'
+    table.insert(G.hand_cards, card3)
+    local card4 = Card(350, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['D_A'], G.P_CENTERS['c_base'])
+    card4.facing = 'back'
+    table.insert(G.hand_cards, card4)
 
     -- NEW: Schedule an animation to move all the cards.
     G.E_MANAGER:add_event(Event({
@@ -132,11 +132,11 @@ function init_item_prototypes()
         func = function()
             print("Event triggered! Moving all cards.")
             -- Loop through the deck and move each card to a new fanned-out position.
-            for i, card in ipairs(G.deck) do
+            for i, card in ipairs(G.hand_cards) do
                 -- Instantly change the card's TARGET position.
                 -- The Moveable:move() function will handle the smooth slide.
-                card.T.x = 100 + (i * 15)
-                card.T.y = 300
+                card.T.x = 100 + (i * 120)
+                card.T.y = 400
             end
             return true -- Return true to remove this event from the queue.
         end
