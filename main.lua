@@ -7,8 +7,10 @@ require "engine/node"
 require "engine/moveable"
 require "engine/sprite"
 require "engine/event"
+require "functions/misc_functions"
 require "game"
 require "globals"
+require "card"
 
 -- The love.load() function is called only once at the start of the game.
 function love.load()

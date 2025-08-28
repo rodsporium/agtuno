@@ -28,6 +28,27 @@ function Moveable:init(args)
     table.insert(G.MOVEABLES, self)
 end
 
+-- NEW: This function establishes the relationship between this object (a minor)
+-- and its parent (the major).
+function Moveable:set_role(args)
+    self.role = {
+        major = args.major,
+        role_type = args.role_type, -- e.g., 'Glued'
+        xy_bond = args.xy_bond or 'Strong', -- How tightly it follows the parent's position
+        r_bond = args.r_bond or 'Strong',   -- How tightly it follows the parent's rotation
+    }
+end
+
+-- NEW: This function is a helper for setting alignment within a parent.
+-- While not used yet, it's part of the same system.
+function Moveable:set_alignment(args)
+    self.alignment = {
+        major = args.major,
+        type = args.type,
+        offset = args.offset
+    }
+end
+
 -- This is the CORE of the animation system!
 -- It's called every single frame for every moveable object.
 function Moveable:move(dt)

@@ -1,0 +1,53 @@
+Phase 1: Making Things Interactive
+Step 1 (Your Current Task): Implement Hovering.
+
+Goal: Make a card scale up or highlight when the mouse is over it.
+
+Engine File: controller.lua (for collision detection).
+
+Concept: The controller checks the mouse position against the position of all cards. If they overlap, it tells the card it's being "hovered". The card's code then changes its own scale or appearance.
+
+Step 2: Implement Clicking and Dragging.
+
+Goal: Click on a card to "pick it up" (it follows the mouse), and release the mouse to "drop" it.
+
+Engine File: controller.lua (for click states).
+
+Concept: The controller will now track mouse button presses. When you click on a card, the card's state changes to "dragging," and its target position (T.x, T.y) is updated to the mouse's position every frame.
+
+Phase 2: Building the Game Board
+Step 3: Create Card Areas.
+
+Goal: Define the logical zones for the "Hand" and the "Cards to be Played" area.
+
+Engine File: node.lua (to create invisible containers).
+
+Concept: Create simple, invisible Node objects that represent these areas. They won't draw anything, but they have a position and size that you can use for collision checks.
+
+Step 4: Managing Cards in Areas.
+
+Goal: When a card is dragged and dropped onto the "Play Area," it snaps into a neat position within that area.
+
+Concept: This introduces the idea of game logic. When you release a dragged card, you'll check if its position overlaps with the "Play Area" Node. If it does, you add the card to a list for that area and use the EventManager to animate it to a designated slot.
+
+Phase 3: Creating the Core Game Loop
+Step 5: The "Play Hand" Button and Game State.
+
+Goal: Add a clickable "Play Hand" button to the screen.
+
+Engine File: ui.lua (from the original files, it builds on Node to create buttons).
+
+Concept: You'll create a simple UI button. When the controller detects a click on this button, it will trigger your main game logic. You'll also introduce a simple state machine (e.g., a variable like G.STATE = 'selecting') to manage whether the player is currently selecting cards or has played a hand.
+
+Step 6: Scoring and Evaluation.
+
+Goal: When the "Play Hand" button is pressed, the game identifies the poker hand and calculates a score.
+
+Concept: This is pure game logic. You'll write a function that looks at the list of cards in your "Play Area," determines the hand (e.g., Pair, Flush), and prints the result to the console.
+
+Phase 4: Completing the Loop
+Step 7: The Deck, Discarding, and Drawing.
+
+Goal: After a hand is played, the cards are removed, and new cards are drawn from a deck to refill the player's hand.
+
+Concept: You'll create a "deck" (a list of card objects). When a hand is played, you'll use the EventManager to animate the played cards off-screen, and then orchestrate a new animation to deal new cards from the deck's position to the hand area.

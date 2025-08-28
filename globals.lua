@@ -6,10 +6,11 @@ function set_globals()
     background = love.graphics.newImage('resources/textures/1x/battlefield.png')
 
     G = {}
-    Card = Sprite:extend()
+
     G.I = {
         NODE = {},
-        SPRITE = {}
+        SPRITE = {},
+        CARD = {}
     }
 
     G.MOVEABLES = {}
@@ -22,6 +23,12 @@ function set_globals()
 
     G.E_MANAGER = EventManager()
 
+    -- Create a simple white image on the fly to use as our card background atlas.
+    local canvas = love.graphics.newCanvas(71, 95)
+    love.graphics.setCanvas(canvas)
+        love.graphics.clear(1, 1, 1, 1) -- White background
+    love.graphics.setCanvas()
+
     -- Load your spritesheet image.
     G.ASSET_ATLAS = {
         cards = {
@@ -30,40 +37,16 @@ function set_globals()
             -- You may need to adjust these values to get a perfect cutout.
             px = 71, -- The width of one card sprite in pixels
             py = 95  -- The height of one card sprite in pixels
+        },
+        centers = {
+            image = love.graphics.newImage("resources/textures/1x/Jokers.png"),
+            px = 71,
+            py = 95
+        },
+        card_back = {
+            image = canvas,
+            px = 71, py = 95
         }
     }
-
-    ace_hearts = Card({
-        -- T is the TARGET transform. We place it at x=50, y=200.
-        T = { x = 50, y = 200, w = 71 * 1.5, h = 95 * 1.5 }, -- Draw the card 50% bigger
-        -- Tell the sprite to use our 'cards' atlas.
-        atlas = G.ASSET_ATLAS.cards,
-        -- Tell it WHICH sprite to cut out. {x=10, y=0} is the King of Hearts.
-        sprite_pos = {x = 12, y = 0}
-    })
-
-    king_hearts = Card({
-        -- T is the TARGET transform. We place it at x=50, y=200.
-        T = { x = 50, y = 400, w = 71 * 1.5, h = 95 * 1.5 }, -- Draw the card 50% bigger
-        -- Tell the sprite to use our 'cards' atlas.
-        atlas = G.ASSET_ATLAS.cards,
-        -- Tell it WHICH sprite to cut out. {x=10, y=0} is the King of Hearts.
-        sprite_pos = {x = 11, y = 0}
-    })
-
-    -- Schedule an animation using the EventManager!
-    G.E_MANAGER:add_event(Event({
-        trigger = 'after',
-        delay = 2, -- Wait for 2 seconds
-        func = function()
-            -- After 2 seconds, this function will run.
-            print("Event triggered! Moving card.")
-            -- It instantly changes the card's TARGET position.
-            ace_hearts.T.x = 400
-            king_hearts.T.x = 400
-            -- The Moveable:move() function will handle the smooth slide.
-            return true -- Return true to remove this event from the queue.
-        end
-    }))
 
 end
