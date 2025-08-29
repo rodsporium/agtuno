@@ -1,0 +1,72 @@
+(Base)
+└── Object
+    ├── Game
+    ├── Controller
+    ├── Event
+    ├── EventManager
+    ├── Back
+    ├── Tag
+    │
+    └── Node
+        │
+        └── Moveable
+            ├── Sprite
+            │   └── AnimatedSprite
+            │
+            ├── Particles
+            ├── DynaText
+            ├── UIBox
+            ├── UIElement
+            ├── Card
+            ├── Blind
+            ├── CardArea
+            └── Card_Character
+
+Explanation of Each Class
+Here is a breakdown of each class, from the most fundamental to the most specialized. This is the order you should focus on learning them.
+
+The Foundation
+Object (engine/object.lua)
+Purpose: This is the "Adam and Eve" of your entire engine. It is the most fundamental blueprint. Its only job is to provide the ability to create other classes (:extend()) and new objects from those classes (()). Every single other class in the game inherits from this one.
+
+The Managers (The "Brains")
+These classes are not visible on screen. They work in the background to manage the game.
+
+Game (game.lua)
+Purpose: This is the master controller for the entire application. There is only one Game object, which you call G. It manages the game's overall state (e.g., are you in the menu or playing a run?), and it tells everything else when to update and draw.
+
+Event & EventManager (engine/event.lua)
+Purpose: The EventManager is the orchestra conductor. It manages a queue of Event objects. An Event is a simple task (like "move this card" or "play this sound") that is scheduled to happen at a specific time. This is the system that allows for complex, overlapping animations without freezing the game.
+
+Controller (engine/controller.lua)
+Purpose: This is the bridge between the player and the game. It tracks the mouse position, keyboard presses, and gamepad inputs. Its most important job is to figure out which game object is being clicked on or hovered over and then tell that object how to react.
+
+The Building Blocks (The "Atoms")
+These are the fundamental classes for everything you see on screen.
+
+Node (engine/node.lua)
+Inherits from: Object
+Purpose: This is the blueprint for any "thing" that has a position and size in the game world. It's an invisible container that holds a transform table (self.T). It can also hold other Nodes as "children," which is how you group objects.
+
+Moveable (engine/moveable.lua)
+Inherits from: Node
+Purpose: This is the animation powerhouse. It takes a Node and adds the magic of smooth movement. It does this by having a "target" position (T) and a "visible" position (VT) that gradually moves towards the target each frame. This "easing" or "tweening" is what creates the fluid motion. Almost every visible object in the game inherits from Moveable.
+
+Sprite (engine/sprite.lua)
+Inherits from: Moveable
+Purpose: This class gives a Moveable object a picture. It knows how to cut out a specific rectangular frame (a "Quad") from a large spritesheet image (an "atlas") and draw it at the object's visible (VT) position.
+
+The Specialized Objects (The "Molecules")
+These are the final, complex objects that make up the game. They are all built by combining the atoms above.
+
+Card (card.lua)
+Inherits from: Moveable
+Purpose: The core object of the game. A Card is a complex container made of multiple child Sprites (a back, a front, a center image for Jokers, seals, editions, etc.). It contains all the logic for what a card is and how it behaves.
+
+CardArea (cardarea.lua)
+Inherits from: Moveable
+Purpose: An invisible container that manages a collection of cards. Your "Hand," the "Deck," and the "Jokers" area are all CardAreas. It handles the automatic layout and alignment of cards within its boundaries.
+
+UIBox & UIElement (engine/ui.lua)
+Inherits from: Moveable
+Purpose: These are the building blocks for the entire user interface. A UIBox is a container that organizes multiple UIElements (which can be text, sprites, or even other UIBoxes). All the menus, pop-ups, and buttons are built with this system.
