@@ -39,11 +39,12 @@ function set_globals()
             py = 95  -- The height of one card sprite in pixels
         },
         centers = {
-            image = love.graphics.newImage("resources/textures/1x/Jokers.png"),
+            image = love.graphics.newImage("resources/textures/1x/Enhancers.png"),
             px = 71,
             py = 95
         },
         card_back = {
+            image = love.graphics.newImage("resources/textures/1x/Enhancers.png"),
             image = canvas,
             px = 71, py = 95
         }

@@ -107,8 +107,13 @@ function init_item_prototypes()
 
     -- This table holds the prototype data for all card "centers".
     G.P_CENTERS = {
-        c_base = { name = 'Base', pos = {x = 0, y = 4} },
+        c_base = { name = 'Base', pos = {x = 1, y = 0} },
         j_joker = { name = 'Joker', pos = {x = 0, y = 0} }
+    }
+
+    -- This table holds the prototype data for all card "backs".
+    G.P_BACKS = {
+        c_back = { name = 'Back1', pos = {x = 0, y = 0} }
     }
 
     G.hand_cards = {}
@@ -118,10 +123,10 @@ function init_item_prototypes()
     local card2 = Card(150, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['H_A'], G.P_CENTERS['c_base'])
     table.insert(G.hand_cards, card2)
     -- Create two cards and set them to face the back
-    local card3 = Card(250, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['C_A'], G.P_CENTERS['c_base'])
+    local card3 = Card(250, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['C_A'], G.P_BACKS['c_back'])
     card3.facing = 'back'
     table.insert(G.hand_cards, card3)
-    local card4 = Card(350, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['D_A'], G.P_CENTERS['c_base'])
+    local card4 = Card(350, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['D_A'], G.P_BACKS['c_back'])
     card4.facing = 'back'
     table.insert(G.hand_cards, card4)
 
