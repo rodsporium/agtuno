@@ -1,11 +1,12 @@
 -- card.lua
 -- This is the blueprint for all cards in the game.
 
----@class Card: Sprite
-Card = Sprite:extend()
+---@class Card: Moveable
+-- Card now inherits from Moveable. This makes it a logical container
+-- for its visual parts (the sprites).
+Card = Moveable:extend()
 
 -- This is the CONSTRUCTOR for a Card object.
--- It takes a position/size (T) and the KEY of the card to look up (center).
 function Card:init(X, Y, W, H, card_front, center, params)
     -- The 'center' table is the prototype data from G.P_CENTERS.
     self.config = {
@@ -13,22 +14,20 @@ function Card:init(X, Y, W, H, card_front, center, params)
     }
 
     -- The 'card' table is the prototype data for the card's face (rank and suit).
-    -- For this test, we will get this from P_CARDS.
     self.config.card = card_front
 
-    -- We now have all the data we need. We can call the Sprite constructor
-    -- to create the actual visible object.
-    -- FIXED: We now pass a single table containing the transform (T),
-    -- the atlas, and the sprite_pos, as the parent constructors expect.
-    Sprite.init(self, {
+    -- Call the parent Moveable constructor. The Card itself is an invisible container.
+    Moveable.init(self, { T = {x = X, y = Y, w = W, h = H} })
+
+    -- Create the CARD FRONT sprite as a child of this Card object.
+    self.children.front = Sprite({
         T = {x = X, y = Y, w = W, h = H},
         atlas = G.ASSET_ATLAS.cards,
         sprite_pos = self.config.card.pos
     })
+    self.children.front:set_role({major = self, role_type = 'Glued'})
 
-    -- A card also has a "center" sprite (for Jokers, etc.)
-    -- For a playing card, this is just the base card back design.
-    -- FIXED: The Sprite constructor also needs a single table.
+    -- Create the CARD CENTER sprite as a child.
     self.children.center = Sprite({
         T = {x = X, y = Y, w = W, h = H},
         atlas = G.ASSET_ATLAS.centers,
@@ -47,7 +46,7 @@ function Card:init(X, Y, W, H, card_front, center, params)
     -- Add a 'facing' state to track which side is up.
     self.facing = 'front'
 
-    -- Add the card to the global instance list for cards.
+    -- Add this card to the global list of cards.
     if getmetatable(self) == Card then
         table.insert(G.I.CARD, self)
     end
@@ -76,15 +75,16 @@ function Card:flip()
     }))
 end
 
--- The Card's draw function is more complex. It needs to draw the center/back,
--- then the front (rank/suit), and any other effects like editions.
+-- The Card's draw function now explicitly draws its children based on its state.
 function Card:draw()
+    -- A Card itself doesn't have a visual; it just manages its children.
+    -- We check the 'facing' state to decide which children to draw.
     if self.facing == 'back' then
         self.children.back:draw()
     else
-        -- Draw the card itself (which is the front sprite)
-        Sprite.draw(self)
-        -- Draw the center art on top
+        -- Draw the center (background) first, then the front (rank/suit) on top.
         self.children.center:draw()
+        self.children.front:draw()
     end
 end
+
