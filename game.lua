@@ -4,9 +4,15 @@
 function start_up()
     set_globals()
     init_item_prototypes()
+
+    -- NEW: Create the global controller instance. This will manage all player input.
+    G.CONTROLLER = Controller()
 end
 
 function update(dt)
+    -- NEW: Update the controller every frame. This is what will check for mouse hovers.
+    G.CONTROLLER:update(dt)
+    
     movement(dt)
 end
 

@@ -9,6 +9,10 @@ function Moveable:init(args)
     -- This sets up the self.T table (the TARGET transform).
     Node.init(self, args)
 
+    -- NEW: Store the base width and height for scaling calculations.
+    self.base_w = self.T.w
+    self.base_h = self.T.h
+
     -- This is the SECRET SAUCE of the entire animation system.
     -- We create a second transform table called 'VT' (Visible Transform).
     -- While 'T' is the GOAL or TARGET position, 'VT' is the position that is
@@ -22,8 +26,8 @@ function Moveable:init(args)
     -- This table will keep track of the object's speed.
     self.velocity = {x = 0, y = 0, r = 0, scale = 0}
 
-    -- NEW: This 'role' table will define the parent-child relationship.
-    self.role = {}
+    -- NEW: This 'role' table will define how this object is attached to another.
+    self.role = { role_type = 'Major', major = self, offset = {x=0, y=0} }
 
     -- We add every new Moveable object to a global list.
     -- This allows our love.update function to easily find and update all of them.
@@ -34,12 +38,16 @@ end
 -- NEW: This function establishes the relationship between this object (a minor)
 -- and its parent (the major).
 function Moveable:set_role(args)
-    self.role = {
-        major = args.major,
-        role_type = args.role_type, -- e.g., 'Glued'
-        xy_bond = args.xy_bond or 'Strong', -- How tightly it follows the parent's position
-        r_bond = args.r_bond or 'Strong',   -- How tightly it follows the parent's rotation
-    }
+    self.role.major = args.major or self
+    self.role.role_type = args.role_type or 'Minor'
+    self.role.offset = args.offset or {x=0, y=0}
+
+    -- self.role = {
+    --     major = args.major,
+    --     role_type = args.role_type, -- e.g., 'Glued'
+    --     xy_bond = args.xy_bond or 'Strong', -- How tightly it follows the parent's position
+    --     r_bond = args.r_bond or 'Strong',   -- How tightly it follows the parent's rotation
+    -- }
 end
 
 -- NEW: This function is a helper for setting alignment within a parent.
@@ -48,6 +56,7 @@ function Moveable:set_alignment(args)
     self.alignment = {
         major = args.major,
         type = args.type,
+        bond = args.bond,
         offset = args.offset
     }
 end
@@ -67,10 +76,20 @@ function Moveable:move(dt)
     self.VT.y = self.VT.y + dy * 7 * dt
     -- Over many frames, this creates the illusion of a smooth slide, or "tween".
 
-    -- NEW: If this object has a parent (a 'major'), update its position
-    -- to follow the parent. This is what makes the card parts stick together.
-    if self.role and self.role.major and self.role.role_type == 'Glued' then
+    -- NEW: Add the exact same logic for scale animation.
+    local ds = self.T.scale - self.VT.scale
+    self.VT.scale = self.VT.scale + ds * 7 * dt
+
+    -- NEW: Update the visible width and height based on the current scale.
+    self.VT.w = self.base_w * self.VT.scale
+    self.VT.h = self.base_h * self.VT.scale
+
+    -- NEW: This entire block is new. If this object is a 'Glued' child,
+    -- its position and size are controlled by its parent ('major').
+    if self.role.role_type == 'Glued' then
         self.VT.x = self.role.major.VT.x
         self.VT.y = self.role.major.VT.y
+        self.VT.w = self.role.major.VT.w
+        self.VT.h = self.role.major.VT.h
     end
 end

@@ -3,6 +3,7 @@
 
 -- Load the foundational files first
 require "engine/object"
+require "engine/controller"
 require "engine/node"
 require "engine/moveable"
 require "engine/sprite"
