@@ -18,7 +18,14 @@ end
 -- This is the main update loop for the controller, called every frame.
 function Controller:update(dt)
     -- Get the current mouse position from LÖVE.
-    self.cursor_position.x, self.cursor_position.y = love.mouse.getPosition()
+    local mx, my = love.mouse.getPosition()
+
+    -- NEW: Translate screen pixel coordinates to game world coordinates.
+    -- This is the crucial fix. For now, we'll assume a simple 1:1 mapping,
+    -- but this is where you would handle scaling if your window size changes.
+    self.cursor_position.x = mx
+    self.cursor_position.y = my
+
 
     -- Figure out which objects the cursor is colliding with.
     self:get_cursor_collision()

@@ -18,6 +18,7 @@ function Card:init(X, Y, W, H, card_front, center, params)
 
     -- Call the parent Moveable constructor. The Card itself is an invisible container.
     Moveable.init(self, { T = {x = X, y = Y, w = W, h = H} })
+    self.states.collide.can = true -- Make the card collider active.
 
     -- Create the CARD FRONT sprite as a child of this Card object.
     self.children.front = Sprite({
@@ -50,6 +51,18 @@ function Card:init(X, Y, W, H, card_front, center, params)
     if getmetatable(self) == Card then
         table.insert(G.I.CARD, self)
     end
+end
+
+-- NEW: This function is called by the controller when the mouse is over the card.
+function Card:hover()
+    -- We set the TARGET scale to 110%. The move() function will handle the smooth animation.
+    self.T.scale = 1.1
+end
+
+-- NEW: This function is called by the controller when the mouse leaves the card.
+function Card:stop_hover()
+    -- We set the TARGET scale back to 100%.
+    self.T.scale = 1.0
 end
 
 -- This function handles the flipping animation.
