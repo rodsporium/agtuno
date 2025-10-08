@@ -45,8 +45,8 @@ function set_globals()
         },
         card_back = {
             image = love.graphics.newImage("resources/textures/1x/Enhancers.png"),
-            image = canvas,
-            px = 71, py = 95
+            px = 71,
+            py = 95
         }
     }
 
