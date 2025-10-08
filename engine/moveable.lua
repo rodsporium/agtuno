@@ -64,17 +64,28 @@ end
 -- This is the CORE of the animation system!
 -- It's called every single frame for every moveable object.
 function Moveable:move(dt)
-    -- Calculate the difference (the vector) between where the object SHOULD BE (T.x)
-    -- and where it CURRENTLY IS on screen (VT.x).
-    local dx = self.T.x - self.VT.x
-    local dy = self.T.y - self.VT.y
 
-    -- Move the VISIBLE position (VT) a small fraction of the way towards the TARGET position (T).
-    -- The number '7' is the "easing factor". A higher number means faster, snappier movement.
-    -- A lower number means slower, smoother movement.
-    self.VT.x = self.VT.x + dx * 7 * dt
-    self.VT.y = self.VT.y + dy * 7 * dt
-    -- Over many frames, this creates the illusion of a smooth slide, or "tween".
+    -- UPDATED: This entire block is now wrapped in a check.
+    -- The smooth easing animation only runs if the object is NOT being dragged.
+    if not self.states.drag.is then
+
+        -- Calculate the difference (the vector) between where the object SHOULD BE (T.x)
+        -- and where it CURRENTLY IS on screen (VT.x).
+        local dx = self.T.x - self.VT.x
+        local dy = self.T.y - self.VT.y
+
+        -- Move the VISIBLE position (VT) a small fraction of the way towards the TARGET position (T).
+        -- The number '7' is the "easing factor". A higher number means faster, snappier movement.
+        -- A lower number means slower, smoother movement.
+        self.VT.x = self.VT.x + dx * 7 * dt
+        self.VT.y = self.VT.y + dy * 7 * dt
+        -- Over many frames, this creates the illusion of a smooth slide, or "tween".
+    else
+        -- If it IS being dragged, we snap the visible position directly
+        -- to the target position to ensure it follows the mouse perfectly.
+        self.VT.x = self.T.x
+        self.VT.y = self.T.y
+    end
 
     -- NEW: Add the exact same logic for scale animation.
     local ds = self.T.scale - self.VT.scale

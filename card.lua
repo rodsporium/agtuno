@@ -10,11 +10,10 @@ Card = Moveable:extend()
 function Card:init(X, Y, W, H, card_front, center, params)
     -- The 'center' table is the prototype data from G.P_CENTERS.
     self.config = {
-        center = center
+        center = center,
+        -- The 'card' table is the prototype data for the card's face (rank and suit).
+        card = card_front
     }
-
-    -- The 'card' table is the prototype data for the card's face (rank and suit).
-    self.config.card = card_front
 
     -- Call the parent Moveable constructor. The Card itself is an invisible container.
     Moveable.init(self, { T = {x = X, y = Y, w = W, h = H} })
@@ -47,6 +46,9 @@ function Card:init(X, Y, W, H, card_front, center, params)
     -- Add a 'facing' state to track which side is up.
     self.facing = 'front'
 
+    -- NEW: Store the offset from the card's origin to the mouse click.
+    self.drag_offset = {x=0, y=0} 
+
     -- Add this card to the global list of cards.
     if getmetatable(self) == Card then
         table.insert(G.I.CARD, self)
@@ -63,6 +65,39 @@ end
 function Card:stop_hover()
     -- We set the TARGET scale back to 100%.
     self.T.scale = 1.0
+end
+
+-- NEW: Called by the controller when a drag begins.
+function Card:start_drag()
+    -- Bring this card to the front of the drawing order.
+    -- This ensures the dragged card appears on top of all others.
+    table.remove(G.I.CARD, self:get_deck_idx())
+    table.insert(G.I.CARD, self)
+
+    self.states.drag.is = true -- Set the drag state to true.
+    -- Stop the hover effect when we start dragging.
+    self:stop_hover()
+end
+
+-- NEW: Called by the controller when a drag ends.
+function Card:stop_drag()
+    self.states.drag.is = false -- Set the drag state to false.
+end
+
+-- NEW: Called by the controller every frame a drag is happening.
+function Card:drag(mx, my)
+    -- Instantly update the card's TARGET position to follow the mouse,
+    -- adjusted by the initial click offset.
+    self.T.x = mx - self.drag_offset.x
+    self.T.y = my - self.drag_offset.y
+end
+
+-- NEW: A helper function to find this card's index in the global deck.
+-- This is needed to bring the card to the front of the draw order.
+function Card:get_deck_idx()
+    for i, card in ipairs(G.I.CARD) do
+        if card == self then return i end
+    end
 end
 
 -- This function handles the flipping animation.

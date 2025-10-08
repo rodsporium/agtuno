@@ -13,6 +13,40 @@ function Controller:init()
 
     -- A list of all objects the cursor is currently touching.
     self.collision_list = {}
+
+    -- NEW: A table to manage the state of the object being dragged.
+    self.dragging = {
+        target = nil,       -- The object currently being dragged.
+        offset = {x = 0, y = 0} -- The offset from the object's origin to the mouse click position.
+    }
+end
+
+-- NEW: This function is called from main.lua whenever the mouse is pressed.
+function Controller:mousepressed(x, y, button)
+    -- Check if there's an object currently being hovered over.
+    if self.hovering.target then
+        -- If so, this is our new drag target!
+        self.dragging.target = self.hovering.target
+
+        -- Calculate the offset. This makes the drag feel natural,
+        -- as if you're picking up the card from the exact point you clicked.
+        self.dragging.offset.x = self.cursor_position.x - self.dragging.target.T.x
+        self.dragging.offset.y = self.cursor_position.y - self.dragging.target.T.y
+
+        -- Tell the card that it has started being dragged.
+        self.dragging.target:start_drag()
+    end
+end
+
+-- NEW: This function is called from main.lua whenever the mouse is released.
+function Controller:mousereleased(x, y, button)
+    -- If we were dragging an object...
+    if self.dragging.target then
+        -- ...tell the object that it's no longer being dragged.
+        self.dragging.target:stop_drag()
+        -- Clear the drag target.
+        self.dragging.target = nil
+    end
 end
 
 -- This is the main update loop for the controller, called every frame.
@@ -26,6 +60,11 @@ function Controller:update(dt)
     self.cursor_position.x = mx
     self.cursor_position.y = my
 
+    -- NEW: If an object is being dragged, update its position.
+    if self.dragging.target then
+        -- Tell the dragged object where the mouse is.
+        self.dragging.target:drag(self.cursor_position.x, self.cursor_position.y)
+    end
 
     -- Figure out which objects the cursor is colliding with.
     self:get_cursor_collision()
@@ -51,21 +90,35 @@ function Controller:get_cursor_collision()
     -- Reset the list for this frame.
     self.collision_list = {}
 
-    -- We only care about cards for now, so we loop through the global card list.
-    for i, card in ipairs(G.I.CARD) do
-        -- Check if the card is visible and allows collision.
-        if card.states.visible and card.states.collide.can then
-            -- Use a simple rectangle check to see if the mouse is inside the card's bounds.
+    -- To make dragging feel right, we check for hovers from top to bottom (last created to first)
+    for i = #G.I.CARD, 1, -1 do
+        local card = G.I.CARD[i]
+        if card ~= self.dragging.target and card.states.visible and card.states.collide.can then
             if self.cursor_position.x > card.VT.x and
                self.cursor_position.x < card.VT.x + card.VT.w and
                self.cursor_position.y > card.VT.y and
                self.cursor_position.y < card.VT.y + card.VT.h then
-                -- If it is, add it to our list of colliding objects.
                 table.insert(self.collision_list, card)
             end
         end
     end
 end
+
+--     -- We only care about cards for now, so we loop through the global card list.
+--     for i, card in ipairs(G.I.CARD) do
+--         -- Check if the card is visible and allows collision.
+--         if card.states.visible and card.states.collide.can then
+--             -- Use a simple rectangle check to see if the mouse is inside the card's bounds.
+--             if self.cursor_position.x > card.VT.x and
+--                self.cursor_position.x < card.VT.x + card.VT.w and
+--                self.cursor_position.y > card.VT.y and
+--                self.cursor_position.y < card.VT.y + card.VT.h then
+--                 -- If it is, add it to our list of colliding objects.
+--                 table.insert(self.collision_list, card)
+--             end
+--         end
+--     end
+-- end
 
 -- Determines the single "top-most" object being hovered.
 function Controller:set_cursor_hover()
