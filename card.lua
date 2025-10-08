@@ -68,11 +68,14 @@ function Card:stop_hover()
 end
 
 -- NEW: Called by the controller when a drag begins.
-function Card:start_drag()
+function Card:start_drag(offset)
     -- Bring this card to the front of the drawing order.
     -- This ensures the dragged card appears on top of all others.
     table.remove(G.I.CARD, self:get_deck_idx())
     table.insert(G.I.CARD, self)
+
+    -- UPDATED: Store the offset that was passed in from the controller.
+    self.drag_offset = offset
 
     self.states.drag.is = true -- Set the drag state to true.
     -- Stop the hover effect when we start dragging.

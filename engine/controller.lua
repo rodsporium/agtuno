@@ -33,8 +33,9 @@ function Controller:mousepressed(x, y, button)
         self.dragging.offset.x = self.cursor_position.x - self.dragging.target.T.x
         self.dragging.offset.y = self.cursor_position.y - self.dragging.target.T.y
 
-        -- Tell the card that it has started being dragged.
-        self.dragging.target:start_drag()
+        -- UPDATED: Pass the calculated offset to the card.
+        -- Now the card knows exactly where it was grabbed.
+        self.dragging.target:start_drag(self.dragging.offset)
     end
 end
 
@@ -103,22 +104,6 @@ function Controller:get_cursor_collision()
         end
     end
 end
-
---     -- We only care about cards for now, so we loop through the global card list.
---     for i, card in ipairs(G.I.CARD) do
---         -- Check if the card is visible and allows collision.
---         if card.states.visible and card.states.collide.can then
---             -- Use a simple rectangle check to see if the mouse is inside the card's bounds.
---             if self.cursor_position.x > card.VT.x and
---                self.cursor_position.x < card.VT.x + card.VT.w and
---                self.cursor_position.y > card.VT.y and
---                self.cursor_position.y < card.VT.y + card.VT.h then
---                 -- If it is, add it to our list of colliding objects.
---                 table.insert(self.collision_list, card)
---             end
---         end
---     end
--- end
 
 -- Determines the single "top-most" object being hovered.
 function Controller:set_cursor_hover()
