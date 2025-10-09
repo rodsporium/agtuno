@@ -47,7 +47,10 @@ function Card:init(X, Y, W, H, card_front, center, params)
     self.facing = 'front'
 
     -- NEW: Store the offset from the card's origin to the mouse click.
-    self.drag_offset = {x=0, y=0} 
+    self.drag_offset = {x=0, y=0}
+
+    -- A card now knows which CardArea it belongs to.
+    self.area = nil
 
     -- Add this card to the global list of cards.
     if getmetatable(self) == Card then
@@ -80,11 +83,23 @@ function Card:start_drag(offset)
     self.states.drag.is = true -- Set the drag state to true.
     -- Stop the hover effect when we start dragging.
     self:stop_hover()
+
+    -- If the card is in an area, remove it when the drag starts.
+    if self.area then
+        self.area:remove_card(self)
+    end
 end
 
 -- NEW: Called by the controller when a drag ends.
 function Card:stop_drag()
-    self.states.drag.is = false -- Set the drag state to false.
+    -- Set the drag state to false.
+    self.states.drag.is = false
+
+    -- When the drag ends, put the card back into its last known area.
+    -- The CardArea will automatically find a new spot for it.
+    if self.area then
+        self.area:emplace(self)
+    end
 end
 
 -- NEW: Called by the controller every frame a drag is happening.
@@ -99,7 +114,9 @@ end
 -- This is needed to bring the card to the front of the draw order.
 function Card:get_deck_idx()
     for i, card in ipairs(G.I.CARD) do
-        if card == self then return i end
+        if card == self then
+            return i
+        end
     end
 end
 

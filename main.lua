@@ -12,6 +12,7 @@ require "functions/misc_functions"
 require "game"
 require "globals"
 require "card"
+require "cardarea"
 
 -- The love.load() function is called only once at the start of the game.
 function love.load()

@@ -12,6 +12,11 @@ end
 function update(dt)
     -- NEW: Update the controller every frame. This is what will check for mouse hovers.
     G.CONTROLLER:update(dt)
+
+    -- NEW: Update our card area. This will re-align cards if needed.
+    if G.hand then
+        G.hand:update(dt)
+    end
     
     movement(dt)
 end
@@ -122,35 +127,22 @@ function init_item_prototypes()
         c_back = { name = 'Back1', pos = {x = 0, y = 0} }
     }
 
-    G.hand_cards = {}
+    -- NEW: Create the 'hand' CardArea at the bottom of the screen.
+    -- It will be 900 units wide and 200 units high.
+    G.hand = CardArea(170, 450, 500, 200)
 
     local card1 = Card(50, 200, 71 * 1.5,  95 * 1.5, G.P_CARDS['S_A'], G.P_CENTERS['c_base'])
-    table.insert(G.hand_cards, card1)
     local card2 = Card(150, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['H_A'], G.P_CENTERS['c_base'])
-    table.insert(G.hand_cards, card2)
-    -- Create two cards and set them to face the back
     local card3 = Card(250, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['C_A'], G.P_BACKS['c_back'])
     card3.facing = 'back'
-    table.insert(G.hand_cards, card3)
     local card4 = Card(350, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['D_A'], G.P_BACKS['c_back'])
     card4.facing = 'back'
-    table.insert(G.hand_cards, card4)
 
-    -- NEW: Schedule an animation to move all the cards.
-    G.E_MANAGER:add_event(Event({
-        trigger = 'after',
-        delay = 2, -- Wait for 2 seconds
-        func = function()
-            print("Event triggered! Moving all cards.")
-            -- Loop through the deck and move each card to a new fanned-out position.
-            for i, card in ipairs(G.hand_cards) do
-                -- Instantly change the card's TARGET position.
-                -- The Moveable:move() function will handle the smooth slide.
-                card.T.x = 100 + (i * 120)
-                card.T.y = 400
-            end
-            return true -- Return true to remove this event from the queue.
-        end
-    }))
+    -- NEW: Use emplace() to add the cards to the hand.
+    -- The CardArea's align_cards() function will automatically position them.
+    G.hand:emplace(card1)
+    G.hand:emplace(card2)
+    G.hand:emplace(card3)
+    G.hand:emplace(card4)
 
 end
