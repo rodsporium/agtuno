@@ -13,7 +13,7 @@ function update(dt)
     -- NEW: Update the controller every frame. This is what will check for mouse hovers.
     G.CONTROLLER:update(dt)
 
-    -- Update all three of our card areas.
+    -- NEW: Update all three card areas. This will re-align cards if needed.
     if G.top_row then G.top_row:update(dt) end
     if G.middle_row then G.middle_row:update(dt) end
     if G.bottom_row then G.bottom_row:update(dt) end
@@ -127,10 +127,11 @@ function init_item_prototypes()
         c_back = { name = 'Back1', pos = {x = 0, y = 0} }
     }
 
-    -- Create three CardAreas for the Pusoy layout.
-    G.top_row = CardArea(440, 50, 420, 180)    -- x, y, width, height
-    G.middle_row = CardArea(320, 225, 660, 180)
-    G.bottom_row = CardArea(320, 400, 660, 180)
+    -- Create the three CardAreas for the Pusoy layout.
+    -- Pass a 'card_limit' to each CardArea so it knows its capacity.
+    G.top_row = CardArea(440, 50, 420, 180, {card_limit = 3})
+    G.middle_row = CardArea(320, 225, 660, 180, {card_limit = 5})
+    G.bottom_row = CardArea(320, 400, 660, 180, {card_limit = 5})
 
     -- Create a full hand of 13 cards.
     local cards = {

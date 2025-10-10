@@ -19,6 +19,9 @@ function Controller:init()
         target = nil,       -- The object currently being dragged.
         offset = {x = 0, y = 0} -- The offset from the object's origin to the mouse click position.
     }
+
+    -- NEW: Keep track of the area under the cursor.
+    self.hovering_area = nil
 end
 
 -- NEW: This function is called from main.lua whenever the mouse is pressed.
@@ -43,8 +46,8 @@ end
 function Controller:mousereleased(x, y, button)
     -- If we were dragging an object...
     if self.dragging.target then
-        -- ...tell the object that it's no longer being dragged.
-        self.dragging.target:stop_drag()
+        -- UPDATED: When the drag stops, tell the card which area it was dropped on.
+        self.dragging.target:stop_drag(self.hovering_area)
         -- Clear the drag target.
         self.dragging.target = nil
     end
@@ -103,6 +106,17 @@ function Controller:get_cursor_collision()
             end
         end
     end
+
+    -- NEW: Also check for collision with the card areas.
+    local areas = { G.top_row, G.middle_row, G.bottom_row }
+    for i, area in ipairs(areas) do
+        if area and self.cursor_position.x > area.VT.x and
+           self.cursor_position.x < area.VT.x + area.VT.w and
+           self.cursor_position.y > area.VT.y and
+           self.cursor_position.y < area.VT.y + area.VT.h then
+            table.insert(self.collision_list, area)
+        end
+    end
 end
 
 -- Determines the single "top-most" object being hovered.
@@ -110,9 +124,23 @@ function Controller:set_cursor_hover()
     self.hovering.prev_target = self.hovering.target
     self.hovering.target = nil
 
-    -- For now, we'll just grab the first object in the collision list.
-    -- In a more complex game, you'd sort this list by a "Z" or layer value.
+    -- NEW: Reset the hovering area.
+    self.hovering_area = nil
+
     if #self.collision_list > 0 then
-        self.hovering.target = self.collision_list[1]
+        -- Find the first card in the list (the top-most one).
+        for _, obj in ipairs(self.collision_list) do
+            if obj:is(Card) then
+                self.hovering.target = obj
+                break
+            end
+        end
+        -- NEW: Find the first area in the list.
+        for _, obj in ipairs(self.collision_list) do
+            if obj:is(CardArea) then
+                self.hovering_area = obj
+                break
+            end
+        end
     end
 end

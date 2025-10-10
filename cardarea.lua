@@ -10,6 +10,8 @@ function CardArea:init(X, Y, W, H, config)
     self.config = config or {}
     self.cards = {}
     self.card_w = 71 * 1.5 -- Standard card width
+    -- NEW: The area now knows its maximum capacity.
+    self.card_limit = config.card_limit or 13
 end
 
 -- Adds a card to this area's internal list and tells the card about its new home.
@@ -29,6 +31,22 @@ function CardArea:remove_card(card)
     end
     card.area = nil
     self:align_cards() -- Re-align all cards whenever one is removed.
+end
+
+-- NEW: This function finds the card in this area closest to a given point.
+function CardArea:find_nearest_card(x, y)
+    local nearest_card = nil
+    local min_dist = 999999
+
+    for _, card in ipairs(self.cards) do
+        -- Use a simple distance check (squared distance is faster).
+        local dist = (card.T.x - x)^2 + (card.T.y - y)^2
+        if dist < min_dist then
+            min_dist = dist
+            nearest_card = card
+        end
+    end
+    return nearest_card
 end
 
 -- UPDATED: The alignment logic now arranges cards in a curved fan shape.
