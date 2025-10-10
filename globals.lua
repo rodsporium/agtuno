@@ -1,4 +1,3 @@
--- globals.lua
 -- This file defines the global 'G' table which will hold all our game-wide data.
 
 function set_globals()
@@ -22,12 +21,6 @@ function set_globals()
     }
 
     G.E_MANAGER = EventManager()
-
-    -- Create a simple white image on the fly to use as our card background atlas.
-    local canvas = love.graphics.newCanvas(71, 95)
-    love.graphics.setCanvas(canvas)
-        love.graphics.clear(1, 1, 1, 1) -- White background
-    love.graphics.setCanvas()
 
     -- Load your spritesheet image.
     G.ASSET_ATLAS = {

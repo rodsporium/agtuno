@@ -1,23 +1,26 @@
--- game.lua
 -- This is the main game logic controller.
 
 function start_up()
+    -- Defines global variables and loads assets.
     set_globals()
+
+    -- Initialize the item prototypes and create initial game objects.
     init_item_prototypes()
 
-    -- NEW: Create the global controller instance. This will manage all player input.
+    -- Create the global controller instance. This will manage all player input.
     G.CONTROLLER = Controller()
 end
 
 function update(dt)
-    -- NEW: Update the controller every frame. This is what will check for mouse hovers.
+    -- Update the controller every frame. This is what will check for mouse hovers.
     G.CONTROLLER:update(dt)
 
     -- NEW: Update all three card areas. This will re-align cards if needed.
     if G.top_row then G.top_row:update(dt) end
     if G.middle_row then G.middle_row:update(dt) end
     if G.bottom_row then G.bottom_row:update(dt) end
-    
+
+    -- Update movement for all moveable objects.
     movement(dt)
 end
 
@@ -43,7 +46,7 @@ function movement(dt)
 end
 
 function draw_fightscene()
-
+    -- Draw the background first.
     love.graphics.draw(background, 0, 0)
 
     -- Loop through all the sprites in our global list and draw them.
