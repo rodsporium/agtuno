@@ -13,10 +13,10 @@ function update(dt)
     -- NEW: Update the controller every frame. This is what will check for mouse hovers.
     G.CONTROLLER:update(dt)
 
-    -- NEW: Update our card area. This will re-align cards if needed.
-    if G.hand then
-        G.hand:update(dt)
-    end
+    -- Update all three of our card areas.
+    if G.top_row then G.top_row:update(dt) end
+    if G.middle_row then G.middle_row:update(dt) end
+    if G.bottom_row then G.bottom_row:update(dt) end
     
     movement(dt)
 end
@@ -127,22 +127,37 @@ function init_item_prototypes()
         c_back = { name = 'Back1', pos = {x = 0, y = 0} }
     }
 
-    -- NEW: Create the 'hand' CardArea at the bottom of the screen.
-    -- It will be 900 units wide and 200 units high.
-    G.hand = CardArea(170, 450, 500, 200)
+    -- Create three CardAreas for the Pusoy layout.
+    G.top_row = CardArea(440, 50, 420, 180)    -- x, y, width, height
+    G.middle_row = CardArea(320, 225, 660, 180)
+    G.bottom_row = CardArea(320, 400, 660, 180)
 
-    local card1 = Card(50, 200, 71 * 1.5,  95 * 1.5, G.P_CARDS['S_A'], G.P_CENTERS['c_base'])
-    local card2 = Card(150, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['H_A'], G.P_CENTERS['c_base'])
-    local card3 = Card(250, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['C_A'], G.P_BACKS['c_back'])
-    card3.facing = 'back'
-    local card4 = Card(350, 200, 71 * 1.5, 95 * 1.5, G.P_CARDS['D_A'], G.P_BACKS['c_back'])
-    card4.facing = 'back'
+    -- Create a full hand of 13 cards.
+    local cards = {
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['S_A'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['H_A'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['C_A'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['D_A'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['S_K'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['H_K'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['C_K'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['D_K'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['S_Q'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['H_Q'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['C_Q'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['D_Q'], G.P_CENTERS['c_base']),
+        Card(0,0, 71*1.5, 95*1.5, G.P_CARDS['S_J'], G.P_CENTERS['c_base']),
+    }
 
-    -- NEW: Use emplace() to add the cards to the hand.
-    -- The CardArea's align_cards() function will automatically position them.
-    G.hand:emplace(card1)
-    G.hand:emplace(card2)
-    G.hand:emplace(card3)
-    G.hand:emplace(card4)
+    -- Distribute the 13 cards into the three rows.
+    for i, card in ipairs(cards) do
+        if i <= 3 then
+            G.top_row:emplace(card)
+        elseif i <= 8 then
+            G.middle_row:emplace(card)
+        else
+            G.bottom_row:emplace(card)
+        end
+    end
 
 end

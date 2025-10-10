@@ -31,29 +31,37 @@ function CardArea:remove_card(card)
     self:align_cards() -- Re-align all cards whenever one is removed.
 end
 
--- This is the core layout function. It arranges cards in a fan shape.
+-- UPDATED: The alignment logic now arranges cards in a curved fan shape.
 function CardArea:align_cards()
     local num_cards = #self.cards
     if num_cards == 0 then return end
 
-    -- Loop through all cards in this area.
+    -- Define the properties of the fan
+    local max_rotation = 0.4 -- The total rotation from one end of the fan to the other.
+    local fan_width = self.T.w * 0.7 -- How much horizontal space the fan occupies.
+    local curve_height = self.T.h * 0.4 -- How high the arc of the fan is.
+    local overlap_factor = 0.6 -- How much the cards overlap. A smaller number means more overlap.
+
+    -- Calculate the total width of the fanned cards to center them.
+    local total_fan_width = (num_cards - 1) * (self.card_w * overlap_factor)
+
     for i, card in ipairs(self.cards) do
-        -- Don't touch a card if the player is currently dragging it.
         if not card.states.drag.is then
 
-            -- The math here creates the fan shape.
-            -- It calculates a position and rotation for each card based on its
-            -- index (i) in the hand.
-            local fan_angle = 0.2 -- How much the fan spreads.
-            local card_angle = (-num_cards/2 + i - 0.5) / num_cards
-            
-            card.T.r = card_angle * fan_angle
-            
-            -- Position the cards along the bottom of the screen.
-            card.T.x = self.T.x + (self.T.w - self.card_w) * (i - 1) / math.max(num_cards - 1, 1) + (self.card_w - card.T.w) / 2
-            
-            -- The 'abs' function creates the curve of the fan.
-            card.T.y = self.T.y + math.abs(card_angle) * 100
+            -- Calculate a normalized position for the card in the hand (-0.5 for the leftmost card, 0.5 for the rightmost).
+            local norm_pos = 0
+            if num_cards > 1 then
+                norm_pos = ((i - 1) / (num_cards - 1)) - 0.5
+            end
+
+            -- 1. Set the rotation based on the normalized position.
+            card.T.r = norm_pos * max_rotation
+
+            -- 2. Set the horizontal position, creating the fan spread.
+            card.T.x = self.T.x + (self.T.w / 2) - (total_fan_width / 2) - (self.card_w/2) + (i-1) * (self.card_w * overlap_factor)
+
+            -- 3. Set the vertical position using a parabola (x^2) to create the curve.
+            card.T.y = self.T.y + (self.T.h / 2) - (card.T.h / 2) + (norm_pos^2) * curve_height
         end
     end
 end
