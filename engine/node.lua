@@ -20,7 +20,6 @@ function Node:init(args)
     }
 
     -- This table holds the object's current states.
-    -- For now, the only one we care about is 'visible'.
     self.states = {
         visible = true,
         collide = {can = false, is = false},
@@ -31,8 +30,7 @@ function Node:init(args)
         release_on = {can = true, is = false}
     }
 
-    -- Every Node can have children. This isn't essential right now,
-    -- but it's a core feature of the engine.
+    -- Every Node can have children.
     if not self.children then
         self.children = {}
     end

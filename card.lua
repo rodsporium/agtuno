@@ -1,6 +1,4 @@
--- card.lua
 -- This is the blueprint for all cards in the game.
-
 ---@class Card: Moveable
 -- Card now inherits from Moveable. This makes it a logical container
 -- for its visual parts (the sprites).
@@ -46,7 +44,7 @@ function Card:init(X, Y, W, H, card_front, center, params)
     -- Add a 'facing' state to track which side is up.
     self.facing = 'front'
 
-    -- NEW: Store the offset from the card's origin to the mouse click.
+    -- Store the offset from the card's origin to the mouse click.
     self.drag_offset = {x=0, y=0}
 
     -- A card now knows which CardArea it belongs to.
@@ -60,26 +58,26 @@ function Card:init(X, Y, W, H, card_front, center, params)
     end
 end
 
--- NEW: This function is called by the controller when the mouse is over the card.
+-- This function is called by the controller when the mouse is over the card.
 function Card:hover()
     -- We set the TARGET scale to 110%. The move() function will handle the smooth animation.
     self.T.scale = 1.1
 end
 
--- NEW: This function is called by the controller when the mouse leaves the card.
+-- This function is called by the controller when the mouse leaves the card.
 function Card:stop_hover()
     -- We set the TARGET scale back to 100%.
     self.T.scale = 1.0
 end
 
--- NEW: Called by the controller when a drag begins.
+-- Called by the controller when a drag begins.
 function Card:start_drag(offset)
     -- Bring this card to the front of the drawing order.
     -- This ensures the dragged card appears on top of all others.
     table.remove(G.I.CARD, self:get_deck_idx())
     table.insert(G.I.CARD, self)
 
-    -- UPDATED: Store the offset that was passed in from the controller.
+    -- Store the offset that was passed in from the controller.
     self.drag_offset = offset
 
     self.states.drag.is = true -- Set the drag state to true.
@@ -121,7 +119,7 @@ function Card:stop_drag(target_area)
     end
 end
 
--- NEW: Called by the controller every frame a drag is happening.
+-- Called by the controller every frame a drag is happening.
 function Card:drag(mx, my)
     -- Instantly update the card's TARGET position to follow the mouse,
     -- adjusted by the initial click offset.
@@ -129,7 +127,7 @@ function Card:drag(mx, my)
     self.T.y = my - self.drag_offset.y
 end
 
--- NEW: A helper function to find this card's index in the global deck.
+-- A helper function to find this card's index in the global deck.
 -- This is needed to bring the card to the front of the draw order.
 function Card:get_deck_idx()
     for i, card in ipairs(G.I.CARD) do
@@ -174,4 +172,3 @@ function Card:draw()
         self.children.front:draw()
     end
 end
-

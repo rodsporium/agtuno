@@ -1,6 +1,4 @@
--- cardarea.lua
 -- This class defines a region on the screen that can hold and arrange cards.
-
 ---@class CardArea: Moveable
 CardArea = Moveable:extend()
 
@@ -10,7 +8,7 @@ function CardArea:init(X, Y, W, H, config)
     self.config = config or {}
     self.cards = {}
     self.card_w = 71 * 1.5 -- Standard card width
-    -- NEW: The area now knows its maximum capacity.
+    -- The area now knows its maximum capacity.
     self.card_limit = config.card_limit or 13
 end
 
@@ -33,7 +31,7 @@ function CardArea:remove_card(card)
     self:align_cards() -- Re-align all cards whenever one is removed.
 end
 
--- NEW: This function finds the card in this area closest to a given point.
+-- This function finds the card in this area closest to a given point.
 function CardArea:find_nearest_card(x, y)
     local nearest_card = nil
     local min_dist = 999999
@@ -49,7 +47,7 @@ function CardArea:find_nearest_card(x, y)
     return nearest_card
 end
 
--- UPDATED: The alignment logic now arranges cards in a curved fan shape.
+-- The alignment logic now arranges cards in a curved fan shape.
 function CardArea:align_cards()
     local num_cards = #self.cards
     if num_cards == 0 then return end

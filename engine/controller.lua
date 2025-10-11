@@ -1,6 +1,4 @@
--- controller.lua
 -- This class is the central hub for all player input.
-
 ---@class Controller
 Controller = Object:extend()
 
@@ -14,17 +12,17 @@ function Controller:init()
     -- A list of all objects the cursor is currently touching.
     self.collision_list = {}
 
-    -- NEW: A table to manage the state of the object being dragged.
+    -- A table to manage the state of the object being dragged.
     self.dragging = {
         target = nil,       -- The object currently being dragged.
         offset = {x = 0, y = 0} -- The offset from the object's origin to the mouse click position.
     }
 
-    -- NEW: Keep track of the area under the cursor.
+    -- Keep track of the area under the cursor.
     self.hovering_area = nil
 end
 
--- NEW: This function is called from main.lua whenever the mouse is pressed.
+-- This function is called from main.lua whenever the mouse is pressed.
 function Controller:mousepressed(x, y, button)
     -- Check if there's an object currently being hovered over.
     if self.hovering.target then
@@ -36,17 +34,17 @@ function Controller:mousepressed(x, y, button)
         self.dragging.offset.x = self.cursor_position.x - self.dragging.target.T.x
         self.dragging.offset.y = self.cursor_position.y - self.dragging.target.T.y
 
-        -- UPDATED: Pass the calculated offset to the card.
+        -- Pass the calculated offset to the card.
         -- Now the card knows exactly where it was grabbed.
         self.dragging.target:start_drag(self.dragging.offset)
     end
 end
 
--- NEW: This function is called from main.lua whenever the mouse is released.
+-- This function is called from main.lua whenever the mouse is released.
 function Controller:mousereleased(x, y, button)
     -- If we were dragging an object...
     if self.dragging.target then
-        -- UPDATED: When the drag stops, tell the card which area it was dropped on.
+        -- When the drag stops, tell the card which area it was dropped on.
         self.dragging.target:stop_drag(self.hovering_area)
         -- Clear the drag target.
         self.dragging.target = nil
@@ -58,13 +56,13 @@ function Controller:update(dt)
     -- Get the current mouse position from LÖVE.
     local mx, my = love.mouse.getPosition()
 
-    -- NEW: Translate screen pixel coordinates to game world coordinates.
+    -- Translate screen pixel coordinates to game world coordinates.
     -- This is the crucial fix. For now, we'll assume a simple 1:1 mapping,
     -- but this is where you would handle scaling if your window size changes.
     self.cursor_position.x = mx
     self.cursor_position.y = my
 
-    -- NEW: If an object is being dragged, update its position.
+    -- If an object is being dragged, update its position.
     if self.dragging.target then
         -- Tell the dragged object where the mouse is.
         self.dragging.target:drag(self.cursor_position.x, self.cursor_position.y)
@@ -107,7 +105,7 @@ function Controller:get_cursor_collision()
         end
     end
 
-    -- NEW: Also check for collision with the card areas.
+    -- Also check for collision with the card areas.
     local areas = { G.top_row, G.middle_row, G.bottom_row }
     for i, area in ipairs(areas) do
         if area and self.cursor_position.x > area.VT.x and
@@ -124,7 +122,7 @@ function Controller:set_cursor_hover()
     self.hovering.prev_target = self.hovering.target
     self.hovering.target = nil
 
-    -- NEW: Reset the hovering area.
+    -- Reset the hovering area.
     self.hovering_area = nil
 
     if #self.collision_list > 0 then
@@ -135,7 +133,7 @@ function Controller:set_cursor_hover()
                 break
             end
         end
-        -- NEW: Find the first area in the list.
+        -- Find the first area in the list.
         for _, obj in ipairs(self.collision_list) do
             if obj:is(CardArea) then
                 self.hovering_area = obj

@@ -1,8 +1,5 @@
--------------------------------------------------
--- Event (The "Task")
--------------------------------------------------
-
 ---@class Event
+--- The task 
 Event = Object:extend()
 
 -- This is the CONSTRUCTOR for a single Event.
@@ -36,12 +33,8 @@ function Event:init(config)
     end
 end
 
-
--------------------------------------------------
--- EventManager (The "Task Manager")
--------------------------------------------------
-
 ---@class EventManager
+--- The task manager
 EventManager = Object:extend()
 
 -- This is the CONSTRUCTOR for the EventManager.
