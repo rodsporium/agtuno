@@ -92,6 +92,10 @@ function Moveable:move(dt)
     local ds = self.T.scale - self.VT.scale
     self.VT.scale = self.VT.scale + ds * 7 * dt
 
+    -- NEW: Add the exact same easing logic for rotation.
+    local dr = self.T.r - self.VT.r
+    self.VT.r = self.VT.r + dr * 7 * dt
+
     -- Update the visible width and height based on the current scale.
     self.VT.w = self.base_w * self.VT.scale
     self.VT.h = self.base_h * self.VT.scale
@@ -102,5 +106,7 @@ function Moveable:move(dt)
         self.VT.y = self.role.major.VT.y
         self.VT.w = self.role.major.VT.w
         self.VT.h = self.role.major.VT.h
+        -- NEW: A glued child must also copy its parent's rotation.
+        self.VT.r = self.role.major.VT.r
     end
 end

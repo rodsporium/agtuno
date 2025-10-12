@@ -12,19 +12,25 @@ function CardArea:init(X, Y, W, H, config)
     self.card_limit = config.card_limit or 13
 end
 
--- This function adds a card to the area.
-function CardArea:emplace(card)
-    table.insert(self.cards, card)
+-- emplace is now smarter. It can insert a card at a specific index.
+function CardArea:emplace(card, index)
+    if index then
+        table.insert(self.cards, index, card)
+    else
+        table.insert(self.cards, card)
+    end
     -- Tell the card which area it now belongs to.
     card.area = self
     -- Re-align all cards whenever a new one is added.
     self:align_cards()
 end
 
--- This function removes a specific card from the area.
+-- This function now returns the index of the removed card.
 function CardArea:remove_card(card)
+    local removed_index = nil
     for i = #self.cards, 1, -1 do
         if self.cards[i] == card then
+            removed_index = i
             table.remove(self.cards, i)
             break
         end
@@ -34,23 +40,26 @@ function CardArea:remove_card(card)
     card.area = nil
     -- Re-align the remaining cards.
     self:align_cards()
+    return removed_index
 end
 
 -- This function finds the card in this area closest to a given point (x, y).
 -- It's the key to the card-swapping logic.
 function CardArea:find_nearest_card(x, y)
     local nearest_card = nil
+    local nearest_index = -1
     local min_dist = 999999 -- Start with a very large number.
 
-    for _, card in ipairs(self.cards) do
+    for i, card in ipairs(self.cards) do
         -- Use squared distance, which is faster than calculating a square root.
         local dist = (card.T.x - x)^2 + (card.T.y - y)^2
         if dist < min_dist then
             min_dist = dist
             nearest_card = card
+            nearest_index = i
         end
     end
-    return nearest_card
+    return nearest_card, nearest_index
 end
 
 -- This is the core logic for arranging the cards in a visually appealing fan.
@@ -58,29 +67,49 @@ function CardArea:align_cards()
     local num_cards = #self.cards
     if num_cards == 0 then return end
 
-    -- Define the properties of the fan shape.
-    local max_rotation = 0.4 -- The total rotation from one end of the fan to the other.
-    local curve_height = self.T.h * 0.4 -- How high the arc of the fan is.
-    local overlap_factor = 0.6 -- How much the cards overlap. A smaller number means more overlap.
+    -- Define the angles for our "half octagon" shape.
+    local angle_far = 0.35   -- The angle for the outermost cards.
+    local angle_near = 0.15  -- The angle for the inner cards.
+
+    local curve_height = self.T.h * 0.4 -- A shallower curve
+    local overlap_factor = 0.25 -- Increased overlap for a tighter hand
 
     -- Calculate the total width of the fanned cards to center them.
     local total_fan_width = (num_cards - 1) * (self.card_w * overlap_factor)
 
     for i, card in ipairs(self.cards) do
+        -- NEW: The CardArea is now responsible for telling each card its index.
+        -- This is what the new sorting logic in game.lua uses.
+        card.hand_idx = i
+
         -- This logic only applies to cards that are not currently being dragged.
         if not card.states.drag.is then
             -- Calculate a "normalized position" for the card in the hand.
             -- This gives a value from -0.5 (leftmost card) to 0.5 (rightmost card).
             local norm_pos = 0
             if num_cards > 1 then
-                norm_pos = ((i - 1) / (num_cards - 1)) - 0.5
+                -- -0.5 (left) to 0.5 (right)
+                norm_pos = ((i - 1) / (num_cards - 1)) - 0.5 
             end
-            -- 1. Set the TARGET rotation based on the normalized position.
-            card.T.r = norm_pos * max_rotation
-            -- 2. Set the TARGET horizontal position, creating the fanned-out spread.
+
+            -- UPDATED: Instead of a smooth rotation, we use steps to create an angular fan.
+            -- This checks which "segment" the card is in and applies a fixed angle.
+            if norm_pos < -0.35 then -- Far-left segment
+                card.T.r = -angle_far
+            elseif norm_pos < -0.15 then -- Inner-left segment
+                card.T.r = -angle_near
+            elseif norm_pos <= 0.15 then -- Center segment
+                card.T.r = 0
+            elseif norm_pos <= 0.35 then -- Inner-right segment
+                card.T.r = angle_near
+            else -- Far-right segment
+                card.T.r = angle_far
+            end
+
+            -- Set the TARGET horizontal position, creating the fanned-out spread.
             card.T.x = self.T.x + (self.T.w / 2) - (total_fan_width / 2) - (self.card_w/2) + (i-1) * (self.card_w * overlap_factor)
-            -- 3. Set the TARGET vertical position using a parabola (norm_pos^2) to create the curve.
-            card.T.y = self.T.y + (self.T.h / 2) - (card.T.h / 2) + (norm_pos^2) * curve_height
+            -- Adjust the y-position using a sine wave for a smoother arc
+            card.T.y = self.T.y + (self.T.h * 0.3) - (card.T.h / 2) + (math.abs(norm_pos)^2) * curve_height
         end
     end
 end

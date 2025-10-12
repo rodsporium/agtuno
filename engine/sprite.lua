@@ -51,6 +51,8 @@ function Sprite:draw()
         self.VT.y,         -- The VISIBLE y-position on the screen
         self.VT.r,         -- The VISIBLE rotation
         self.VT.w / self.atlas.px, -- The scale factor for the width
-        self.VT.h / self.atlas.py  -- The scale factor for the height
+        self.VT.h / self.atlas.py,  -- The scale factor for the height
+        self.atlas.px / 2, -- NEW: Set the origin to the center for proper rotation
+        self.atlas.py / 2  -- NEW: Set the origin to the center for proper rotation
     )
 end

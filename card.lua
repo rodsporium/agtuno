@@ -52,6 +52,12 @@ function Card:init(X, Y, W, H, card_front, center, params)
 
     self.last_area = nil -- Remember where the card came from.
 
+    -- Remember the card's exact slot in the hand.
+    self.last_idx = nil
+
+    -- NEW: Initialize the hand index property.
+    self.hand_idx = 0
+
     -- Add this card to the global list of cards.
     if getmetatable(self) == Card then
         table.insert(G.I.CARD, self)
@@ -86,12 +92,14 @@ function Card:start_drag(offset)
 
     -- If the card is in an area, remove it when the drag starts.
     if self.area then
-        self.last_area = self.area -- Remember the original area.
-        self.area:remove_card(self)
+        -- Remember the original area.
+        self.last_area = self.area
+        -- When a card is removed, its index is returned and stored.
+        self.last_idx = self.area:remove_card(self) 
     end
 end
 
--- stop_drag now handles the swapping logic.
+-- stop_drag is now smarter and preserves card positions during swaps.
 function Card:stop_drag(target_area)
     self.states.drag.is = false
     
@@ -99,15 +107,17 @@ function Card:stop_drag(target_area)
     if target_area then
         -- And that area is full...
         if #target_area.cards >= target_area.card_limit then
-            -- Find the card to swap with.
-            local card_to_swap = target_area:find_nearest_card(self.T.x, self.T.y)
+            -- find_nearest_card now returns the card AND its index.
+            local card_to_swap, swap_idx = target_area:find_nearest_card(self.T.x, self.T.y)
             if card_to_swap then
                 -- Perform the swap.
                 target_area:remove_card(card_to_swap)
                 if self.last_area then
-                    self.last_area:emplace(card_to_swap)
+                    -- Place the swapped card into the original card's old slot.
+                    self.last_area:emplace(card_to_swap, self.last_idx)
                 end
-                target_area:emplace(self)
+                -- Place the dragged card into the swapped card's old slot.
+                target_area:emplace(self, swap_idx)
             end
         -- Otherwise, if the area has space, just add the card.
         else
@@ -115,7 +125,8 @@ function Card:stop_drag(target_area)
         end
     -- If dropped in empty space, return to the last area.
     elseif self.last_area then
-        self.last_area:emplace(self)
+        -- If dropped in empty space, return to the original slot.
+        self.last_area:emplace(self, self.last_idx)
     end
 end
 

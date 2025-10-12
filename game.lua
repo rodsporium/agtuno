@@ -12,16 +12,23 @@ function start_up()
 end
 
 function update(dt)
-    -- Update the controller every frame. This is what will check for mouse hovers.
-    G.CONTROLLER:update(dt)
+    -- 1. First, update the game clock.
+    G.TIMERS.TOTAL = G.TIMERS.TOTAL + dt
 
-    -- NEW: Update all three card areas. This will re-align cards if needed.
+    -- 2. Next, run the movement logic for ALL objects.
+    -- This ensures every card's Visible Transform (VT) is updated to its
+    -- correct on-screen position for the current frame.
+    movement(dt)
+
+    -- 3. Then, update the card areas. This sets the TARGET transform (T) for the next frame.
     if G.top_row then G.top_row:update(dt) end
     if G.middle_row then G.middle_row:update(dt) end
     if G.bottom_row then G.bottom_row:update(dt) end
 
-    -- Update movement for all moveable objects.
-    movement(dt)
+    -- 4. FINALLY, update the controller.
+    -- Now, when the controller checks for collisions, it will be using the
+    -- up-to-date, correct on-screen positions of the cards.
+    G.CONTROLLER:update(dt)
 end
 
 function draw()
@@ -29,10 +36,6 @@ function draw()
 end
 
 function movement(dt)
-
-    -- Update the game's clock.
-    G.TIMERS.TOTAL = G.TIMERS.TOTAL + dt
-
     -- Update the EventManager. This is the heartbeat of the animation system.
     G.E_MANAGER:update(dt)
 
@@ -42,12 +45,26 @@ function movement(dt)
     for k, v in ipairs(G.MOVEABLES) do
         v:move(dt)
     end
- 
 end
 
 function draw_fightscene()
     -- Draw the background first.
     love.graphics.draw(background, 0, 0)
+
+    -- UPDATED: This new sorting logic fixes the layering issue.
+    -- It sorts by row first, then by card order within the row.
+    table.sort(G.I.CARD, function(a, b)
+        -- Rule 1: The card being dragged is always on top (drawn last).
+        if a.states.drag.is then return false end
+        if b.states.drag.is then return true end
+
+        if a.area and b.area then
+            if a.area.T.y < b.area.T.y then return true end
+            if a.area.T.y > b.area.T.y then return false end
+            return a.hand_idx < b.hand_idx
+        end
+        return false
+    end)
 
     -- Loop through all the sprites in our global list and draw them.
     for k, v in ipairs(G.I.CARD) do
@@ -130,11 +147,11 @@ function init_item_prototypes()
         c_back = { name = 'Back1', pos = {x = 0, y = 0} }
     }
 
-    -- Create the three CardAreas for the Pusoy layout.
-    -- Pass a 'card_limit' to each CardArea so it knows its capacity.
-    G.top_row = CardArea(440, 50, 420, 180, {card_limit = 3})
-    G.middle_row = CardArea(320, 225, 660, 180, {card_limit = 5})
-    G.bottom_row = CardArea(320, 400, 660, 180, {card_limit = 5})
+    -- UPDATED: The Y-coordinates of the CardAreas are now closer together to create an overlap.
+    -- You can adjust these numbers to change how much the rows overlap.
+    G.top_row    = CardArea(440, 300, 420, 180, {card_limit = 3})
+    G.middle_row = CardArea(320, 360, 660, 180, {card_limit = 5})
+    G.bottom_row = CardArea(320, 420, 660, 180, {card_limit = 5})
 
     -- Create a full hand of 13 cards.
     local cards = {
