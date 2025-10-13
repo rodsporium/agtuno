@@ -90,6 +90,9 @@ function Card:start_drag(offset)
     -- Stop the hover effect when we start dragging.
     self:stop_hover()
 
+    -- NEW: Set the target rotation to 0 when dragging starts.
+    self.T.r = 0
+
     -- If the card is in an area, remove it when the drag starts.
     if self.area then
         -- Remember the original area.
