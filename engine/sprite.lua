@@ -55,4 +55,7 @@ function Sprite:draw()
         self.atlas.px / 2, -- NEW: Set the origin to the center for proper rotation
         self.atlas.py / 2  -- NEW: Set the origin to the center for proper rotation
     )
+
+    -- NEW: Call the troubleshooter function to draw the bounding box.
+    self:draw_boundingrect()
 end

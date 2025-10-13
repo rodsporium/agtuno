@@ -76,13 +76,20 @@ function Card:stop_hover()
     self.T.scale = 1.0
 end
 
+-- NEW: This is called when a dragged card is hovering over this one.
+function Card:drop_hover()
+    -- We'll make it pop up even more than a normal hover.
+    self.T.scale = 1.25
+end
+
+-- NEW: This is called when the dragged card is no longer hovering over this one.
+function Card:stop_drop_hover()
+    -- It should return to its normal hover state.
+    self.T.scale = 1.0
+end
+
 -- Called by the controller when a drag begins.
 function Card:start_drag(offset)
-    -- Bring this card to the front of the drawing order.
-    -- This ensures the dragged card appears on top of all others.
-    table.remove(G.I.CARD, self:get_deck_idx())
-    table.insert(G.I.CARD, self)
-
     -- Store the offset that was passed in from the controller.
     self.drag_offset = offset
 
@@ -103,32 +110,42 @@ function Card:start_drag(offset)
 end
 
 -- stop_drag is now smarter and preserves card positions during swaps.
-function Card:stop_drag(target_area)
+function Card:stop_drag(target_area, card_to_swap)
     self.states.drag.is = false
     
-    -- If dropped on a valid area...
-    if target_area then
-        -- And that area is full...
-        if #target_area.cards >= target_area.card_limit then
-            -- find_nearest_card now returns the card AND its index.
-            local card_to_swap, swap_idx = target_area:find_nearest_card(self.T.x, self.T.y)
-            if card_to_swap then
-                -- Perform the swap.
-                target_area:remove_card(card_to_swap)
-                if self.last_area then
-                    -- Place the swapped card into the original card's old slot.
-                    self.last_area:emplace(card_to_swap, self.last_idx)
-                end
-                -- Place the dragged card into the swapped card's old slot.
-                target_area:emplace(self, swap_idx)
-            end
-        -- Otherwise, if the area has space, just add the card.
+   -- If we dropped on a valid card to swap with...
+    if card_to_swap and card_to_swap.area then
+        local swap_area = card_to_swap.area
+
+        -- If swapping within the SAME row...
+        if swap_area == self.last_area then
+            local swap_idx = card_to_swap.hand_idx -- Get index of target card (in the N-1 array)
+
+            -- To perform a clean swap, we must operate on the full list.
+            -- First, put the dragged card back where it came from.
+            self.last_area:emplace(self, self.last_idx)
+
+            -- Now that the list is complete again, find the NEW, correct index of the target card.
+            local new_swap_idx = card_to_swap.hand_idx
+
+            -- Finally, perform the atomic swap.
+            self.last_area:swap_cards(self.last_idx, new_swap_idx)
+
+        -- Otherwise, it's a swap between DIFFERENT rows.
         else
-            target_area:emplace(self)
+            local swap_idx = swap_area:remove_card(card_to_swap)
+            if self.last_area then
+                self.last_area:emplace(card_to_swap, self.last_idx)
+            end
+            swap_area:emplace(self, swap_idx)
         end
-    -- If dropped in empty space, return to the last area.
+
+    -- Else if we dropped on an empty slot in an area...
+    elseif target_area and #target_area.cards < target_area.card_limit then
+        target_area:emplace(self)
+
+    -- Otherwise, return to the last known position.
     elseif self.last_area then
-        -- If dropped in empty space, return to the original slot.
         self.last_area:emplace(self, self.last_idx)
     end
 end

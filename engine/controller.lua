@@ -20,6 +20,7 @@ function Controller:init()
 
     -- Keep track of the area under the cursor.
     self.hovering_area = nil
+
 end
 
 -- NEW HELPER FUNCTION: This is the core of the fix.
@@ -71,7 +72,8 @@ function Controller:mousereleased(x, y, button)
     -- If we were dragging an object...
     if self.dragging.target then
         -- When the drag stops, tell the card which area it was dropped on.
-        self.dragging.target:stop_drag(self.hovering_area)
+        -- UPDATED: Pass both the area and the specific card being hovered over.
+        self.dragging.target:stop_drag(self.hovering_area, self.hovering.target)
         -- Clear the drag target.
         self.dragging.target = nil
     end
@@ -94,21 +96,28 @@ function Controller:update(dt)
         self.dragging.target:drag(self.cursor_position.x, self.cursor_position.y)
     end
 
+    -- Store the previous hover target before we find the new one.
+    self.hovering.prev_target = self.hovering.target
+
     -- Figure out which objects the cursor is colliding with.
     self:get_cursor_collision()
 
     -- Based on the collision list, determine the single object being hovered.
     self:set_cursor_hover()
 
-    -- Now, tell the objects whether they are being hovered or not.
+    -- If the hovered card has changed since the last frame...
     if self.hovering.target ~= self.hovering.prev_target then
-        -- If we started hovering over a new object, tell it to react.
-        if self.hovering.target then
-            self.hovering.target:hover()
-        end
-        -- If we stopped hovering over the previous object, tell it to stop reacting.
-        if self.hovering.prev_target then
-            self.hovering.prev_target:stop_hover()
+        -- If we are dragging a card...
+        if self.dragging.target then
+            -- ...tell the NEW card underneath to pop up (drop_hover).
+            if self.hovering.target then self.hovering.target:drop_hover() end
+            -- ...tell the OLD card underneath to stop popping up.
+            if self.hovering.prev_target then self.hovering.prev_target:stop_drop_hover() end
+        -- Otherwise, if we are just moving the mouse normally...
+        else
+            -- ...do the normal hover effect.
+            if self.hovering.target then self.hovering.target:hover() end
+            if self.hovering.prev_target then self.hovering.prev_target:stop_hover() end
         end
     end
 end
@@ -150,22 +159,25 @@ function Controller:get_cursor_collision()
         end
     end
 
-    -- The collision check for areas remains the same, but now uses the smarter check.
+    -- UPDATED: This block now correctly finds the top-most CardArea.
     local areas = { G.top_row, G.middle_row, G.bottom_row }
-    for i, area in ipairs(areas) do
-        -- CardAreas are not rotated, so a simple check is fine here.
-        if area and self.cursor_position.x > area.VT.x and
-           self.cursor_position.x < area.VT.x + area.VT.w and
-           self.cursor_position.y > area.VT.y and
-           self.cursor_position.y < area.VT.y + area.VT.h then
+    -- 1. Sort the areas by their Y position, from top of screen to bottom.
+    table.sort(areas, function(a, b) return a.T.y < b.T.y end)
+
+    -- 2. Loop backwards, checking the bottom-most (front-most) area first.
+    for i = #areas, 1, -1 do
+        local area = areas[i]
+        -- Use the rotation-aware check, as CardAreas are also Moveables with a center origin.
+        if area and is_point_in_rotated_rect(self.cursor_position.x, self.cursor_position.y, area) then
             table.insert(self.collision_list, area)
+            break
         end
     end
 end
 
 -- Determines the single "top-most" object being hovered.
 function Controller:set_cursor_hover()
-    self.hovering.prev_target = self.hovering.target
+    -- self.hovering.prev_target is now set in the main update loop.
     self.hovering.target = nil
     -- Reset the hovering area.
     self.hovering_area = nil

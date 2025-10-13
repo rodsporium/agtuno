@@ -47,3 +47,26 @@ function Node:draw()
         end
     end
 end
+
+-- UPDATED: This is the corrected troubleshooter function.
+function Node:draw_boundingrect()
+    if self.VT then
+        love.graphics.push()
+            -- Set the color to red with 50% transparency.
+            love.graphics.setColor(1, 0, 0, 0.5)
+
+            -- 1. Move the coordinate system's origin to the center of our object.
+            love.graphics.translate(self.VT.x, self.VT.y)
+            -- 2. Rotate the entire coordinate system.
+            love.graphics.rotate(self.VT.r)
+            -- 3. Draw a simple, non-rotated rectangle centered at the new (0,0) origin.
+            love.graphics.rectangle(
+                "line",
+                -self.VT.w / 2,
+                -self.VT.h / 2,
+                self.VT.w,
+                self.VT.h
+            )
+        love.graphics.pop()
+    end
+end

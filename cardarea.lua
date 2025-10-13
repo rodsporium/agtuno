@@ -62,6 +62,15 @@ function CardArea:find_nearest_card(x, y)
     return nearest_card, nearest_index
 end
 
+-- NEW: This function performs a direct swap of two cards within the same area.
+function CardArea:swap_cards(card1_idx, card2_idx)
+    if card1_idx and card2_idx and self.cards[card1_idx] and self.cards[card2_idx] then
+        -- This is a standard Lua trick to swap two table elements without a temporary variable.
+        self.cards[card1_idx], self.cards[card2_idx] = self.cards[card2_idx], self.cards[card1_idx]
+        self:align_cards()
+    end
+end
+
 -- This is the core logic for arranging the cards in a visually appealing fan.
 function CardArea:align_cards()
     local num_cards = #self.cards
