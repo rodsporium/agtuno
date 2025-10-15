@@ -27,7 +27,6 @@ function set_globals()
         cards = {
             image = love.graphics.newImage("resources/textures/1x/8BitDeck.png"),
             -- These are the pixel dimensions of a SINGLE card on your spritesheet.
-            -- You may need to adjust these values to get a perfect cutout.
             px = 71, -- The width of one card sprite in pixels
             py = 95  -- The height of one card sprite in pixels
         },

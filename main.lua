@@ -31,7 +31,6 @@ end
 
 -- This function is called by LÖVE when a mouse button is pressed.
 function love.mousepressed(x, y, button)
-    -- We pass the event directly to our global controller.
     if G.CONTROLLER then
         G.CONTROLLER:mousepressed(x, y, button)
     end
@@ -39,7 +38,6 @@ end
 
 -- This function is called by LÖVE when a mouse button is released.
 function love.mousereleased(x, y, button)
-    -- We pass the event directly to our global controller.
     if G.CONTROLLER then
         G.CONTROLLER:mousereleased(x, y, button)
     end

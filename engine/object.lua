@@ -1,8 +1,22 @@
+-- This is the "master blueprint" for every class in your engine.
+-- It's an empty table that will hold the core functions for inheritance.
 Object = {}
+
+-- This is the most important line for inheritance in Lua.
+-- '__index' is a special key. When you try to access something on an object
+-- (like my_card:move()) and it doesn't exist on that specific object,
+-- Lua will look inside the table pointed to by __index.
+-- By setting it to itself, we make Object the ultimate fallback for all methods.
 Object.__index = Object
+
+-- This is the base "constructor" function for all objects.
+-- Every class you create (Node, Moveable, etc.) will have its own 'init' function,
+-- and they all eventually call this empty one at the top of the chain.
 function Object:init()
 end
 
+-- This is the "factory" that creates new classes.
+-- When you write "Node = Object:extend()", this function is what runs.
 function Object:extend()
   local cls = {}
   for k, v in pairs(self) do
@@ -16,17 +30,8 @@ function Object:extend()
   return cls
 end
 
-
--- function Object:implement(...)
---   for _, cls in pairs({...}) do
---     for k, v in pairs(cls) do
---       if self[k] == nil and type(v) == "function" then
---         self[k] = v
---       end
---     end
---   end
--- end
-
+-- This is a utility function to check an object's "ancestry".
+-- It answers the question: "Is this object a Card?" or "Is this object a Moveable?"
 function Object:is(T)
   local mt = getmetatable(self)
   while mt do
@@ -38,10 +43,9 @@ function Object:is(T)
   return false
 end
 
--- function Object:__tostring()
---   return "Object"
--- end
-
+-- This is another special Lua "metamethod" that makes creating objects clean.
+-- It allows you to create a new object by calling the class name as if it were a function.
+-- Example: my_card = Card(...)
 function Object:__call(...)
   local obj = setmetatable({}, self)
   obj:init(...)

@@ -26,14 +26,6 @@ function Moveable:init(args)
         scale = self.T.scale
     }
 
-    -- This table will keep track of the object's speed.
-    self.velocity = {
-        x = 0,
-        y = 0,
-        r = 0,
-        scale = 0
-    }
-
     -- This 'role' table will define how this object is attached to another.
     self.role = {
         role_type = 'Major',
@@ -45,6 +37,16 @@ function Moveable:init(args)
     -- This allows our love.update function to easily find and update all of them.
     G.MOVEABLES = G.MOVEABLES or {}
     table.insert(G.MOVEABLES, self)
+end
+
+-- NEW: This function instantly snaps the visible transform to the target transform.
+function Moveable:hard_set_VT()
+    self.VT.x = self.T.x
+    self.VT.y = self.T.y
+    self.VT.w = self.T.w
+    self.VT.h = self.T.h
+    self.VT.r = self.T.r
+    self.VT.scale = self.T.scale
 end
 
 -- This function establishes the relationship between this object (a minor)

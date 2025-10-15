@@ -12,22 +12,26 @@ function start_up()
 end
 
 function update(dt)
-    -- 1. First, update the game clock.
+    -- Update the game clock.
     G.TIMERS.TOTAL = G.TIMERS.TOTAL + dt
 
-    -- 2. Next, run the movement logic for ALL objects.
+    -- Run the movement logic for ALL objects.
     -- This ensures every card's Visible Transform (VT) is updated to its
     -- correct on-screen position for the current frame.
     movement(dt)
 
-    -- 3. Then, update the card areas. This sets the TARGET transform (T) for the next frame.
-    if G.top_row then G.top_row:update(dt) end
-    if G.middle_row then G.middle_row:update(dt) end
-    if G.bottom_row then G.bottom_row:update(dt) end
+    -- Update the card areas. This sets the TARGET transform (T) for the next frame.
+    if G.top_row then
+        G.top_row:update(dt)
+    end
+    if G.middle_row then
+        G.middle_row:update(dt)
+    end
+    if G.bottom_row then
+        G.bottom_row:update(dt)
+    end
 
-    -- 4. FINALLY, update the controller.
-    -- Now, when the controller checks for collisions, it will be using the
-    -- up-to-date, correct on-screen positions of the cards.
+    -- Update the controller.
     G.CONTROLLER:update(dt)
 end
 
@@ -36,7 +40,7 @@ function draw()
 end
 
 function movement(dt)
-    -- Update the EventManager. This is the heartbeat of the animation system.
+    -- Update the EventManager.
     G.E_MANAGER:update(dt)
 
     -- This is the core of the animation.
@@ -48,21 +52,32 @@ function movement(dt)
 end
 
 function draw_fightscene()
-    -- Draw the background first.
-    love.graphics.draw(background, 0, 0)
+    -- This block fixes the "zoomed-in" background.
+    -- Step 1: Get the current width and height of the window.
+    local winW, winH = love.graphics.getDimensions()
+    -- Step 2: Get the width and height of the background image.
+    local bgW, bgH = background:getDimensions()
+    -- Step 3: Calculate the scaling factor needed to fill the screen.
+    local scaleX = winW / bgW
+    local scaleY = winH / bgH
+    -- Step 4: Draw the background with the calculated scaling.
+    love.graphics.draw(background, 0, 0, 0, scaleX, scaleY)
 
-    -- UPDATED: This new sorting logic fixes the layering issue.
-    -- It sorts by row first, then by card order within the row.
+    -- This function is a "comparator".
+    -- Its job is to look at card 'a' and card 'b' and decide which one should come first in the sorted list.
     table.sort(G.I.CARD, function(a, b)
         -- Rule 1: The card being dragged is always on top (drawn last).
         if a.states.drag.is then return false end
         if b.states.drag.is then return true end
 
+        -- Rule 2: We only proceed if both cards are actually in a valid row (`card.area`).
         if a.area and b.area then
             if a.area.T.y < b.area.T.y then return true end
             if a.area.T.y > b.area.T.y then return false end
+            -- Rule 3: If cards are in the same row, sort by their position in that row.
             return a.hand_idx < b.hand_idx
         end
+        -- Rule 4: If one or both cards aren't in an area, don't change their order.
         return false
     end)
 
@@ -138,8 +153,7 @@ function init_item_prototypes()
 
     -- This table holds the prototype data for all card "centers".
     G.P_CENTERS = {
-        c_base = { name = 'Base', pos = {x = 1, y = 0} },
-        j_joker = { name = 'Joker', pos = {x = 0, y = 0} }
+        c_base = { name = 'Base', pos = {x = 1, y = 0} }
     }
 
     -- This table holds the prototype data for all card "backs".
@@ -147,8 +161,7 @@ function init_item_prototypes()
         c_back = { name = 'Back1', pos = {x = 0, y = 0} }
     }
 
-    -- UPDATED: The Y-coordinates of the CardAreas are now closer together to create an overlap.
-    -- You can adjust these numbers to change how much the rows overlap.
+    -- Create CardAreas for our hand
     G.top_row    = CardArea(440, 300, 420, 180, {card_limit = 3})
     G.middle_row = CardArea(320, 360, 660, 180, {card_limit = 5})
     G.bottom_row = CardArea(320, 420, 660, 180, {card_limit = 5})
@@ -179,6 +192,12 @@ function init_item_prototypes()
         else
             G.bottom_row:emplace(card)
         end
+    end
+
+    -- After all cards have been created and placed in their areas,
+    -- loop through them and snap their visible positions to their final target positions.
+    for k, v in ipairs(G.I.CARD) do
+        v:hard_set_VT()
     end
 
 end

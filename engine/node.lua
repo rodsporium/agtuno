@@ -52,7 +52,10 @@ end
 function Node:draw_boundingrect()
     if self.VT then
         love.graphics.push()
-            -- Set the color to red with 50% transparency.
+            -- Remember the current color before we change it.
+            local r, g, b, a = love.graphics.getColor()
+
+            -- Set the color to red for the debug box.
             love.graphics.setColor(1, 0, 0, 0.5)
 
             -- 1. Move the coordinate system's origin to the center of our object.
@@ -68,5 +71,8 @@ function Node:draw_boundingrect()
                 self.VT.h
             )
         love.graphics.pop()
+
+        -- After drawing, set the color back to what it was before.
+        love.graphics.setColor(r, g, b, a)
     end
 end
